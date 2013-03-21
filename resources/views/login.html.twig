@@ -3,23 +3,22 @@
 
 {% block content %}
 
-
-		<form action="{{ path('login') }}" method="post">
-				<fieldset>
-					<h2>LOGIN</h2>
-					<p>
-						<label for="login">Login</label><br/>
-						<input type="text" name="login" value=""/>
-					</p>
-					<p>
-						<label for="password">Password</label><br/>
-						<input type="text" name="password" value=""/>
-					</p>
-					<p class="right">
-						<br/><input type="submit" name="btn_login" value="START" />
-						<input type="hidden" name="action" value="login"/>
-					</p>
-									</fieldset>
+		<fieldset>
+			<h2>LOGIN</h2>
+			{% if error %}
+		        <div class="alert alert-error">
+		            {{ error }}
+		        </div>
+		        <div class="alert alert-info">
+		            <strong>Hint:</strong> Try <code>username</code>/<code>password</code>
+		        </div>
+		    {% endif %}
+			<form action="{{ path('login_check') }}" method="post" novalidate {{ form_enctype(form) }} >
+				{{ form_widget(form) }}
+				<p class="right">
+					<button type="submit">START</BUTTON>
+				</p>
 			</form>
+		</fieldset>
 
 {% endblock %}
