@@ -1,0 +1,25 @@
+{% extends 'layout.html.twig' %}
+{% set active = 'account' %}
+
+{% block content %}
+
+
+		<form action="{{ path('login') }}" method="post">
+				<fieldset>
+					<h2>LOGIN</h2>
+					<p>
+						<label for="login">Login</label><br/>
+						<input type="text" name="login" value=""/>
+					</p>
+					<p>
+						<label for="password">Password</label><br/>
+						<input type="text" name="password" value=""/>
+					</p>
+					<p class="right">
+						<br/><input type="submit" name="btn_login" value="START" />
+						<input type="hidden" name="action" value="login"/>
+					</p>
+									</fieldset>
+			</form>
+
+{% endblock %}

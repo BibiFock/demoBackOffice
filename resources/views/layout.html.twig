@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" style="">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
+	<title>mini Backoffice</title> 
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0,user-scalable=no">
+	<link href="{{ app.request.basepath }}/css/site.css" rel="stylesheet" type="text/css">
+	<style>
+		@import url('http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic');
+		@import url('{{ app.request.basepath }}/css/entypo.css');
+	</style>
+	<script type="text/javascript" src="{{ app.request.basepath }}/js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="{{ app.request.basepath }}/js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="{{ app.request.basepath }}/js/jquery.json-2.4.min.js"></script>
+	<script type="text/javascript" src="{{ app.request.basepath }}/js/modernizr-2.6.2.js"></script>
+</head>
+<body>
+	<section class="main">
+		<header class="main">
+			<hgroup class="center col4">
+			<p ><a href="{{ path('logout') }}" >Logout</a></p>
+			</hgroup>
+
+			<div class="col8"> &nbsp;</div>
+			<div class="clear">&nbsp;</div>
+		</header>
+		<article class="main">
+			<div class="col4 section-list">
+				<ul>
+					<li >section 1</li>
+					<li >section 2</li>
+					<li >section 3</li>
+					<li >section 4</li>
+				</ul>
+			</div>
+			<div class="col8 view">
+            	{% block content %}
+            	{% endblock %}
+			</div>
+			<div class="clear">&nbsp;</div>
+		</article>
+		<footer class="main">
+		</footer>
+	</section>
+	<script type="text/javascript">
+		bindCustomEvents('*');
+	</script>
+</body>
+</html>
