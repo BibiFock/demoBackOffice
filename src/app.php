@@ -6,7 +6,6 @@ use Silex\Provider\FormServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
-
 use Silex\Provider\TranslationServiceProvider;
 
 $app->register(new TranslationServiceProvider());

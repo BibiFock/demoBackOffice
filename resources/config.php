@@ -1,6 +1,11 @@
 <?php
 
 $app['debug'] = true;
+if($app['debug']){ 
+	error_reporting(E_ALL | E_STRICT);
+	ini_set('display_errors', 1);
+	ini_set('log_errors', 1);
+}
 
 // Local
 //$app['session.default_locale'] = $app['locale'];
