@@ -1,6 +1,13 @@
 <?php
 
+//TODO affiche les sections tout le temps (gérer l'utilisateur anonyme)
 $app->mount("/", new DemoBackOffice\Controller\IndexController());
+
+$app->error(function (\Exception $e, $code) use ($app) { 
+	if (404 == $code) { 
+		return $app["twig"]->render("404.html.twig"); 
+	} 
+}); 
 
 //$app->get('/logout', function() use ($app) {
     //return $app['twig']->render('layout.html.twig', array('name' => 'test'));
