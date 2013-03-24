@@ -1,0 +1,18 @@
+
+{% extends 'layout.html.twig' %}
+{% set active = 'section' %}
+
+{% block content %}
+				<div class="hero-unit">
+					<h3>Bienvenue dans la section <em>name</em></h3>
+					<p>Ici vous ne pouvez que <strong>voir</strong> (et <strong>modifier</strong> le contenu de la section cette page</p>
+					<form class="form-horizontal text-center">
+						<div class="control-group">
+							<textarea class="span9" rows="4">contenue ici</textarea>
+						</div>
+						<div class="control-group">
+							<button>save</button>
+						</div>
+					</form>
+				</div>
+{% endblock %}
