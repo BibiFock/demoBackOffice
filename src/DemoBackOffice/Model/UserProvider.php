@@ -8,7 +8,7 @@ namespace DemoBackOffice\Model{
 	use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 	use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 	use Exception;
-	use DemoBackOffice\Model\User;
+	use DemoBackOffice\Model\Entity\User;
 
 	class UserProvider implements UserProviderInterface{
 
@@ -20,7 +20,7 @@ namespace DemoBackOffice\Model{
 
 		/** UserProviderInterface * */
 		public function loadUserByUsername($username){
-			$stmt = $this->app['db']->executeQuery('SELECT id_user, login_user, password_user, id_type_user FROM user WHERE login_user = ? and id_status_user > 0', array(strtolower($username)));
+			$stmt = $this->app['db']->executeQuery('SELECT id_user, login_user, password_user, id_type_user FROM user WHERE login_user = ? ', array(strtolower($username)));
 			if (!$user = $stmt->fetch()) {
 				throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
 			}
@@ -39,7 +39,7 @@ namespace DemoBackOffice\Model{
 
 		function supportsClass($class) {
 			//return $class === 'Symfony\Component\Security\Core\User\User';
-			return $class === 'DemoBackOffice\Model\User';
+			return $class === 'DemoBackOffice\Model\Entity\User';
 		}
 
 	}

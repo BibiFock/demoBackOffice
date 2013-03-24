@@ -1,5 +1,5 @@
 <?php
-namespace DemoBackOffice\Model{
+namespace DemoBackOffice\Model\Entity{
 
 	class Section{
 

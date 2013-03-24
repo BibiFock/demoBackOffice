@@ -1,9 +1,10 @@
 <?php
 
-//TODO affiche les sections tout le temps (gérer l'utilisateur anonyme)
 $app->mount("/", new DemoBackOffice\Controller\IndexController());
 $app->mount("/manage/", new DemoBackOffice\Controller\ManageController());
 $app->mount("/manage/section/", new DemoBackOffice\Controller\ManageSectionController());
+$app->mount("/manage/right/", new DemoBackOffice\Controller\ManageUserTypeController());
+
 $app->error(function (\Exception $e, $code) use ($app) { 
 	if($app['debug']) return;
 	if (404 == $code) { 

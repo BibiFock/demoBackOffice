@@ -1,5 +1,5 @@
 <?php    
-namespace DemoBackOffice\Model{
+namespace DemoBackOffice\Model\Entity{
 	use Symfony\Component\Security\Core\User\UserInterface;
 
 	class User implements UserInterface

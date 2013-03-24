@@ -3,7 +3,7 @@
 					<ul class="nav nav-list">
 						{% if(is_granted('IS_AUTHENTICATED_FULLY') ) %}
 							<li class="nav-header">Admin Part</li>
-							{% set menus = ['access', 'users', 'sections'] %}
+							{% set menus = ['rights', 'users', 'sections'] %}
 							{% for menu in menus %}
 							<li class="{{ menu == active ? 'active':  ''}}"><a href="{{ path('manage.' ~ menu) }}">{{ menu }}</a></li>
 							{% endfor %}

@@ -7,7 +7,6 @@ namespace DemoBackOffice\Controller{
 	use Silex\ControllerCollection;
 	use Symfony\Component\Validator\Constraints as Assert;
 	use Symfony\Component\HttpFoundation\Request;
-	use DemoBackOffice\Model as Model;
 	use Exception;
 
 	class ManageController implements ControllerProviderInterface{

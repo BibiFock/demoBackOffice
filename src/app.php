@@ -74,3 +74,7 @@ $app['manager.section'] = $app->share(function () use ($app) {
 	return new DemoBackOffice\Model\SectionManager($app['db']);
 });
 
+$app['manager.rights'] = $app->share(function () use ($app) {
+	return new DemoBackOffice\Model\UserTypeManager($app['db']);
+});
+

@@ -7,7 +7,7 @@ namespace DemoBackOffice\Controller{
 	use Silex\ControllerCollection;
 	use Symfony\Component\Validator\Constraints as Assert;
 	use Symfony\Component\HttpFoundation\Request;
-	use DemoBackOffice\Model as Model;
+	use DemoBackOffice\Model\Entity\Section;
 	use Exception;
 
 	class ManageSectionController implements ControllerProviderInterface{
@@ -51,7 +51,7 @@ namespace DemoBackOffice\Controller{
 					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100')))
 				))
 				->getForm();
-			$jsonSaveSection = array('url' => $app['url_generator']->generate('manage.sections.save'));
+			$jsonSaveSection = array('url' => $app['url_generator']->generate('manage.sections.save', array('name' => $section->name)));
 			if($request->isMethod('POST') && !$error){
 				$form->bind($request);
 				try{
