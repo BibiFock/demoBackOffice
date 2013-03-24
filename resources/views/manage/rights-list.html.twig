@@ -22,7 +22,7 @@
 								<td>{{ right.update }}</td>
 								<td>{{ right.description }}</td>
 								<td>
-									<a class="btn btn-small" href="{{ path('manage.rights.edit', {'name':right.name})}}" >EDIT</a>
+									<a class="btn btn-small" href="{{ path('manage.rights.edit', {'id':right.id})}}" >EDIT</a>
 									{% if right.canDelete() %}
 									<button class="btn btn-small" data-role="delSection" data-options="{&quot;url&quot;: &quot;{{ path('manage.rights.delete',  {'id': right.id }) }}&quot;}">DELETE</a>
 									{% endif %}

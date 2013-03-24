@@ -16,7 +16,7 @@ namespace DemoBackOffice\Controller{
 			$index = $app['controllers_factory'];
 			$index->match("/",'DemoBackOffice\Controller\ManageUserTypeController::userType')->bind("manage.rights");
 			$index->match("/edit/{id}",'DemoBackOffice\Controller\ManageUserTypeController::userTypeEdit')->value('id', '')->assert('id', '[0-9]*')->bind("manage.rights.edit");
-			$index->match("/save/{id}",'DemoBackOffice\Controller\ManageUserTypeController::userTypeSave')->value('name', '')->assert('id', '[0-9]*')->bind("manage.rights.save");
+			$index->match("/save/{id}",'DemoBackOffice\Controller\ManageUserTypeController::userTypeSave')->value('id', '')->assert('id', '[0-9]*')->bind("manage.rights.save");
 			$index->match("/del/{id}",'DemoBackOffice\Controller\ManageUserTypeController::userTypeDel')->assert('id', '[0-9]+')->bind("manage.rights.delete");
 
 			return $index;
@@ -56,7 +56,7 @@ namespace DemoBackOffice\Controller{
 					$datas = $form->getData();
 					if($form->isValid()){
 						$datas = $form->getData();
-						$userType = $app['manager.rights']->saveUserType($datas['id'], $datas['description'], $isNew);
+						$userType = $app['manager.rights']->saveUserType($datas['name'], $datas['description'], $isNew);
 						$app['session']->getFlashBag()->add('info', 'Rights '.$userType->name.' '.($isNew ? 'created' : 'updated'));
 						if($isNew) return $app->redirect($app['url_generator']->generate('manage.rights.edit', array('id' => $userType->id)));
 					}else $isErrorForm = true;
@@ -82,8 +82,8 @@ namespace DemoBackOffice\Controller{
 			return "okidel";
 		}
 
-		public function userTypeSave(Application $app, Request $request, $name){
-			return $this->userTypeEdit($app, $request, $name, true);
+		public function userTypeSave(Application $app, Request $request, $id){
+			return $this->userTypeEdit($app, $request, $id, true);
 		}
 
 	}

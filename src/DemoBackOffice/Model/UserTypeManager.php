@@ -15,7 +15,9 @@ namespace DemoBackOffice\Model{
 		}
 
 		public function deleteUserType(UserType $userType){
-			$stmt = $this->db->executeQuery("delete from type_user where id_type_user=?", array( $userType->id));
+			if($userType->canDelete()){
+				$stmt = $this->db->executeQuery("delete from type_user where id_type_user=?", array( $userType->id));
+			}
 		}
 
 		/**
@@ -57,7 +59,7 @@ SQL;
 insert into type_user (type_user, date_creation_type_user, date_modification_type_user, description_type_user) 
 values (?, NOW(), NOW(), ?)
 SQL;
-				$params = array( $name, $content);
+				$params = array( $name, $description);
 			}
 			$this->db->executequery($sql, $params);
 			if($typeUser == null) $typeUser = $this->getUserTypeByName($name);
