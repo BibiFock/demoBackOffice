@@ -21,8 +21,6 @@ namespace DemoBackOffice\Controller{
 			$options['dbname'] = $dbname;
 			$sql = file_get_contents($app['db.options.schema']);
 			$db->executeQuery($sql);
-			//TODO finish insert
-			//CHECK all is fine
 			return true;
 		}
 	
@@ -44,6 +42,7 @@ namespace DemoBackOffice\Controller{
 				->add('user', 'text', array('data' => $app['db.options']['user']))
 				->add('password', 'text', array('data' => $app['db.options']['password'], 'required' => false))
 				->getForm();
+			$installDone = false;
 			if('POST' == $request->getMethod()){
 				$form->bind($request);
 				if($form->isValid()){
@@ -54,15 +53,18 @@ namespace DemoBackOffice\Controller{
 						$app['db.options'] = $datas;
 					}
 				}else $isErrorForm = true;
+				try{
+					$installDone = $this->testDb($app);
+					$app['session']->getFlashBag()->add('info', 'Databse create');
+				}catch(Exception $e){
+					$app['session']->getFlashBag()->add('error', 'Database Error'.$e->getMessage());
+				}
+
 			}	
-			try{
-				$this->testDb($app);
-			}catch(Exception $e){
-				$app['session']->getFlashBag()->add('error', 'Database Error'.$e->getMessage());
-			}
 			return $app['twig']->render('install.html.twig', array(
 				'form'  => $form->createView(),
 				'isErrorForm' => $isErrorForm,
+				'installDone' => $installDone,
 			)); 
 		}
 	}

@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `section` (
   `date_creation_section` datetime NOT NULL,
   `date_modification_section` datetime NOT NULL,
   `content_section` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `id_status_section` int(11) COLLATE utf8_unicode_ci DEFAULT 0,
   PRIMARY KEY (`id_section`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -98,21 +99,12 @@ CREATE TABLE IF NOT EXISTS `user` (
   KEY `login_user` (`login_user`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
---
--- Contenu de la table `user`
---
-
-CREATE TABLE IF NOT EXISTS `type_user` (
-  `id_type_user` int(11) NOT NULL AUTO_INCREMENT,
-  `type_user` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `description_type_user` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `date_creation_type_user` datetime NOT NULL,
-  `date_modification_type_user` datetime NOT NULL,
-  PRIMARY KEY (`id_type_user`),
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+ INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 1, 'section', NOW(), NOW(), '', 2);
+ INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 2, 'user', NOW(), NOW(), '', 2);
+ INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 3, 'right', NOW(), NOW(), '', 2);
 
 INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
-(1, 'ROLE_ADMIN', 'Super user', '2013-03-20 00:00:00', '2013-03-20 00:00:00');
+(1, 'ROLE_ADMIN', 'Super user', NOW(), NOW());
 INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
 (2, 'ROLE_ANONIMOUS', 'unlogged account', '2013-03-20 00:00:00', '2013-03-20 00:00:00');
 
