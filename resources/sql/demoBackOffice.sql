@@ -28,13 +28,12 @@ SET time_zone = "+00:00";
 
 CREATE TABLE IF NOT EXISTS `access` (
   `id_section` int(11) NOT NULL,
-  `id_user` int(11) NOT NULL,
+  `id_type_user` int(11) NOT NULL,
   `id_type_access` int(11) NOT NULL,
   `date_creation_access` datetime NOT NULL,
   `date_modification_access` datetime NOT NULL,
-  `id_statut_access` int(11) NOT NULL DEFAULT '-1',
-  PRIMARY KEY (`id_section`,`id_user`),
-  KEY `id_user` (`id_user`)
+  PRIMARY KEY (`id_section`,`id_type_user`),
+  KEY `id_type_user` (`id_type_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -47,8 +46,7 @@ CREATE TABLE IF NOT EXISTS `section` (
   `id_section` int(11) NOT NULL AUTO_INCREMENT,
   `name_section` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `date_creation_section` datetime NOT NULL,
-  `date_modification_section` int(11) NOT NULL,
-  `id_statut_section` int(11) NOT NULL DEFAULT '-1',
+  `date_modification_section` datetime NOT NULL,
   `content_section` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id_section`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
@@ -63,6 +61,8 @@ CREATE TABLE IF NOT EXISTS `type_access` (
   `id_type_access` int(11) NOT NULL AUTO_INCREMENT,
   `type_access` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `description_access` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `date_creation_access` datetime NOT NULL,
+  `date_modification_access` datetime NOT NULL,
   PRIMARY KEY (`id_type_access`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS `type_user` (
   `id_type_user` int(11) NOT NULL AUTO_INCREMENT,
   `type_user` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `description_type_user` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `date_creation_type_user` datetime NOT NULL,
+  `date_modification_type_user` datetime NOT NULL,
   PRIMARY KEY (`id_type_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -92,7 +94,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   `id_type_user` int(11) NOT NULL,
   `date_creation_user` datetime DEFAULT NULL,
   `date_modification_user` datetime DEFAULT NULL,
-  `id_status_user` int(11) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id_user`),
   KEY `login_user` (`login_user`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
@@ -101,8 +102,19 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Contenu de la table `user`
 --
 
+  `id_type_user` int(11) NOT NULL AUTO_INCREMENT,
+  `type_user` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `description_type_user` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `date_creation_type_user` datetime NOT NULL,
+  `date_modification_type_user` datetime NOT NULL,
+
+INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
+(1, 'ROLE_ADMIN', 'Super user', '2013-03-20 00:00:00', '2013-03-20 00:00:00');
+INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
+(1, 'ROLE_ANONIMOUS', 'unlogged account', '2013-03-20 00:00:00', '2013-03-20 00:00:00');
+
 INSERT INTO `user` (`id_user`, `login_user`, `password_user`, `id_type_user`, `date_creation_user`, `date_modification_user`, `id_status_user`) VALUES
-(1, 'admin', 'admin', 1, '2013-03-20 00:00:00', '2013-03-20 00:00:00', 1);
+(1, 'admin', 'admin', 2, '2013-03-20 00:00:00', '2013-03-20 00:00:00', 1);
 
 --
 -- Contraintes pour les tables exportées
@@ -112,7 +124,7 @@ INSERT INTO `user` (`id_user`, `login_user`, `password_user`, `id_type_user`, `d
 -- Contraintes pour la table `access`
 --
 ALTER TABLE `access`
-  ADD CONSTRAINT `access_ibfk_2` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `access_ibfk_2` FOREIGN KEY (`id_type_user`) REFERENCES `type_user` (`id_type_user`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `access_ibfk_1` FOREIGN KEY (`id_section`) REFERENCES `section` (`id_section`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

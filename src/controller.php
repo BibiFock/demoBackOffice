@@ -1,6 +1,7 @@
 <?php
 
 $app->mount("/", new DemoBackOffice\Controller\IndexController());
+$app->mount("/install", new DemoBackOffice\Controller\InstallController());
 $app->mount("/manage/", new DemoBackOffice\Controller\ManageController());
 $app->mount("/manage/section/", new DemoBackOffice\Controller\ManageSectionController());
 $app->mount("/manage/right/", new DemoBackOffice\Controller\ManageUserTypeController());

@@ -1,0 +1,26 @@
+{% extends 'layout.html.twig' %}
+{% set active = 'install' %}
+
+{% block content %}
+<h3>Configure database connection and create the content</h3>
+{% if isErrorForm %}
+	<div class="alert alert-error">
+	{% if isErrorForm %}
+		{{ form_errors(form.driver) }}
+		{{ form_errors(form.host) }}
+		{{ form_errors(form.dbname) }}
+		{{ form_errors(form.user) }}
+		{{ form_errors(form.password) }}
+	{% endif %}
+	</div>
+{% endif %}
+
+
+    <form action="{{ path('install.index') }}" method="post" {{ form_enctype(form) }} class="form-vertical">
+        	{{ form_widget(form) }}
+            <button type="submit" class="btn btn-primary">{{ 'install' }}</button>
+		</div>
+    </form>
+	</div>
+
+{% endblock %}
