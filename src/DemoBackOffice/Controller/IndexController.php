@@ -54,12 +54,8 @@ namespace DemoBackOffice\Controller{
 			$index = $app['controllers_factory'];
 			$index->match("/",'DemoBackOffice\Controller\IndexController::login')->bind("index.index");
 			$index->match("/login",'DemoBackOffice\Controller\IndexController::login')->bind("index.login");
-<<<<<<< HEAD
-			//$index->match("/logout",'DemoBackOffice\Controller\IndexController::logout')->bind("index.login");
-=======
 			$index->match("/home",'DemoBackOffice\Controller\IndexController::index')->bind("index.home");
 			//$index->match("/logout",'DemoBackOffice\Controller\IndexController::logout')->bind("index.logout");
->>>>>>> new_branch_name
 			return $index;
 		}
 	}
