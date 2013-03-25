@@ -78,4 +78,3 @@ $app['manager.rights'] = $app->share(function () use ($app) {
 	return new DemoBackOffice\Model\UserTypeManager($app['db']);
 });
 
->>>>>>> new_branch_name
