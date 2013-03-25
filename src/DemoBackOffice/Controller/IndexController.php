@@ -10,11 +10,18 @@ namespace DemoBackOffice\Controller{
 
 	class IndexController implements ControllerProviderInterface{
 
-		public function index(Application $app){
-			return $app['twig']->render('home.html.twig'); 
+		public function connect(Application $app){
+			// créer un nouveau controller basé sur la route par défaut
+			$index = $app['controllers_factory'];
+			$index->match("/",'DemoBackOffice\Controller\IndexController::login')->bind("index.index");
+			$index->match("/login",'DemoBackOffice\Controller\IndexController::login')->bind("index.login");
+			$index->match("/home",'DemoBackOffice\Controller\IndexController::index')->bind("index.home");
+			//$index->match("/logout",'DemoBackOffice\Controller\IndexController::logout')->bind("index.logout");
+			return $index;
 		}
 
 		public function login(Application $app, Request $request){
+
 			$form = $app['form.factory']->createBuilder('form')
 				->add('username', 'text')
 				->add('password', 'password')
@@ -49,15 +56,6 @@ namespace DemoBackOffice\Controller{
 			//return $app->redirect($app['url_generator']->generate('index.index'));
 		//}
 
-		public function connect(Application $app){
-			// créer un nouveau controller basé sur la route par défaut
-			$index = $app['controllers_factory'];
-			$index->match("/",'DemoBackOffice\Controller\IndexController::login')->bind("index.index");
-			$index->match("/login",'DemoBackOffice\Controller\IndexController::login')->bind("index.login");
-			$index->match("/home",'DemoBackOffice\Controller\IndexController::index')->bind("index.home");
-			//$index->match("/logout",'DemoBackOffice\Controller\IndexController::logout')->bind("index.logout");
-			return $index;
-		}
 	}
 
 }

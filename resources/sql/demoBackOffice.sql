@@ -102,19 +102,22 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Contenu de la table `user`
 --
 
+CREATE TABLE IF NOT EXISTS `type_user` (
   `id_type_user` int(11) NOT NULL AUTO_INCREMENT,
   `type_user` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `description_type_user` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `date_creation_type_user` datetime NOT NULL,
   `date_modification_type_user` datetime NOT NULL,
+  PRIMARY KEY (`id_type_user`),
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
 INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
 (1, 'ROLE_ADMIN', 'Super user', '2013-03-20 00:00:00', '2013-03-20 00:00:00');
 INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
-(1, 'ROLE_ANONIMOUS', 'unlogged account', '2013-03-20 00:00:00', '2013-03-20 00:00:00');
+(2, 'ROLE_ANONIMOUS', 'unlogged account', '2013-03-20 00:00:00', '2013-03-20 00:00:00');
 
-INSERT INTO `user` (`id_user`, `login_user`, `password_user`, `id_type_user`, `date_creation_user`, `date_modification_user`, `id_status_user`) VALUES
-(1, 'admin', 'admin', 2, '2013-03-20 00:00:00', '2013-03-20 00:00:00', 1);
+INSERT INTO `user` (`id_user`, `login_user`, `password_user`, `id_type_user`, `date_creation_user`, `date_modification_user`) VALUES
+(1, 'admin', 'admin', 2, '2013-03-20 00:00:00', '2013-03-20 00:00:00');
 
 --
 -- Contraintes pour les tables exportées

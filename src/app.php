@@ -24,15 +24,7 @@ $app->register(new TwigServiceProvider(), array(
     'twig.path'           => array(__DIR__ . '/../resources/views'),
 ));
 
-$app->register(new DoctrineServiceProvider(), array(
-	'db.options' => array(
-		'driver'   => 'pdo_mysql',
-		'host'     => '127.0.0.1',
-		'dbname'   => 'demoBackOffice',
-		'user'     => 'root',
-		'password' => '',
-	)
-));
+$app->register(new DoctrineServiceProvider());
 
 $app->register(new SecurityServiceProvider(), array(
 	'security.firewalls' => array(
