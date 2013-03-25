@@ -6,6 +6,25 @@ namespace DemoBackOffice\Controller{
 	use Silex\ControllerProviderInterface;
 	use Silex\ControllerCollection;
 	use Symfony\Component\HttpFoundation\Request;
+<<<<<<< HEAD
+
+	class IndexController implements ControllerProviderInterface{
+		public $form = "this is a form";
+
+		public function login(Application $app, Request $request){
+			$form = $app['form.factory']->createBuilder('form')
+				->add('username', 'text', array('label' => 'Username', 'data' => $app['session']->get('_security.last_username')))
+				->add('password', 'password', array('label' => 'Password'))
+				->getForm();
+
+			return $app['twig']->render('login.html.twig', array(
+					'form'  => $form->createView(),
+					'error' => $app['security.last_error']($request),
+				));
+		}
+
+		//public function logout(Application $app){
+=======
 	use Exception;
 
 	class IndexController implements ControllerProviderInterface{
@@ -47,6 +66,7 @@ namespace DemoBackOffice\Controller{
 		//public function logout(Application $app){
 			//$app['session']->set('isAuthenticated', false);
 			//return $app->redirect($app['url_generator']->generate('index.index'));
+>>>>>>> new_branch_name
 		//}
 
 		public function connect(Application $app){

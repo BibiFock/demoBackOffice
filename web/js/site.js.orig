@@ -26,7 +26,10 @@ function bindCustomEvents( baseElement ){
 	
 	if( roles ){
 		$.each(roles, function(k, v){
+<<<<<<< HEAD
+=======
 			console.log($(v).attr('data-role') + '/' + $(v).attr('data-options'));
+>>>>>>> new_branch_name
 			var fct = $(v).attr('data-role');
 			if( fct && functions[fct] ){
 				//prevent event accumulation
@@ -58,16 +61,37 @@ function fetchOptions(el){
 
 
 var functions = {
+<<<<<<< HEAD
+	'myFunction': function(){
+		$( this.el ).click(function(){
+
+			var fields = $('#fields');
+			var formParams = $( this ).parentsUntil( '.search', 'form').serialize();
+			var target = $('.patterns');
+
+			$.ajax({
+				type: 'POST',
+				url: 'model',
+				data: 'todo=get_sentences&'+formParams,
+=======
 	'sendAjax': function(method, url, params, target){
 			$.ajax({
 				type: method,
 				url: url,
 				data: params,
+>>>>>>> new_branch_name
 				'beforeSend': function(){
 					functions.displayLoadingImg( target );
 				},
 				'complete': function( res ) {
 					if(res != "false"){
+<<<<<<< HEAD
+						$( target ).empty().append( res.response ).delay(2000);
+						bindCustomEvents('.patterns');
+					}
+				}
+			});
+=======
 						$( target ).empty().append( res.responseText ).delay(2000);
 						bindCustomEvents(target);
 					}
@@ -100,6 +124,7 @@ var functions = {
 				var target = $('.hero-unit');
 				functions.sendAjax('POST', opts.url, null, target)
 			}
+>>>>>>> new_branch_name
 			return false;
 		});
 	},

@@ -1,5 +1,13 @@
 <?php
 
+<<<<<<< HEAD
+//TODO affiche les sections tout le temps (gérer l'utilisateur anonyme)
+$app->mount("/", new DemoBackOffice\Controller\IndexController());
+
+$app->error(function (\Exception $e, $code) use ($app) { 
+	if (404 == $code) { 
+		return $app["twig"]->render("404.html.twig"); 
+=======
 $app->mount("/", new DemoBackOffice\Controller\IndexController());
 $app->mount("/install", new DemoBackOffice\Controller\InstallController());
 $app->mount("/manage/", new DemoBackOffice\Controller\ManageController());
@@ -10,6 +18,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
 	if($app['debug']) return;
 	if (404 == $code) { 
 		return $app->redirect($app['url_generator']->generate('index.index'));
+>>>>>>> new_branch_name
 	} 
 }); 
 

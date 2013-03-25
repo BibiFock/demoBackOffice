@@ -1,0 +1,18 @@
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container-fluid">
+				<a class="brand" href="{{ url('index.index') }}">Project name</a>
+				{% if( is_granted('IS_AUTHENTICATED_FULLY')) %}
+				<p class="navbar-text pull-right">
+					<a href="{{ path('manage_logout') }}">{{ app.security.token.username }} <span class="icon-off"></span></a>
+				</p>
+				{% else %}
+				<form class="navbar-form pull-right">
+					<input class="span2" type="text" placeholder="login" /> 
+					<input class="span2" type="password" placeholder="password" />
+					<button class="btn" >Login</button>
+				</form>
+				{% endif %}
+			</div>				
+		</div>
+	</div>

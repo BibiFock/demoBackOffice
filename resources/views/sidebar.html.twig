@@ -1,0 +1,16 @@
+			<div class="span3">
+				<div class="well sidebar-nav">
+					<ul class="nav nav-list">
+						{% if(is_granted('IS_AUTHENTICATED_FULLY') ) %}
+							<li class="nav-header">Admin Part</li>
+							{% set menus = ['rights', 'users', 'sections'] %}
+							{% for menu in menus %}
+							<li class="{{ menu == active ? 'active':  ''}}"><a href="{{ path('manage.' ~ menu) }}">{{ menu }}</a></li>
+							{% endfor %}
+						{% endif %}
+						<li class="nav-header">Sections</li>
+						<li ><a href="#">section 1</a></li>
+						<li ><a href="#">section 2</a></li>
+					</ul>
+				</div>
+			</div>

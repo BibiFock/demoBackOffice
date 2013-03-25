@@ -1,0 +1,36 @@
+{% extends (ajax ? 'ajax.html.twig' : 'layout.html.twig' ) %}
+{% set active = 'sections' %}
+
+{% block content %}
+					<h3>{{ section ? 'Edit' : 'Create' }} a section</h3>
+    				<form action="{{ path('manage.sections.edit') }}" method="post" {{ isNew ? '' : 'data-role="saveForm"' }} data-options="{{ jsonSaveSection }}" {{ form_enctype(form) }} class="form-horizontal">
+						{% if error or isErrorForm %}
+					        <div class="alert alert-error">
+					            {% if isErrorForm %}
+									{{ form_errors(form.name) }}
+									{{ form_errors(form.content) }}
+					            {% else %}
+									{{ error }}
+					            {% endif %}
+					        </div>
+					    {% endif %}
+
+						{{ form_label(form.name, 'Section name') }}
+						{{ form_widget(form.name) }}
+
+						{{ form_label(form.content, 'Section content') }}
+						{{ form_widget(form.content) }}
+						{{ form_rest(form) }}
+						<br />
+						<button class="btn btn-button" >SAVE</button>
+					</form>
+					<table class="table table-striped table-hover table-condensed">
+						<thead>
+							<tr><th>Accès</th><th>update</th><th>statut</th></tr>
+						</thead>
+						<tbody>
+							<tr><td>admin</td><td>2012</td><td><select><option>EDIT</option></select></tr>
+						</tbody>
+					</table>
+					<a href=" {{ path('manage.sections') }}" class="btn btn-button text-right">SEE THE LIST</a>
+{% endblock %}
