@@ -45,15 +45,16 @@ namespace DemoBackOffice\Controller{
 			$installDone = false;
 			if('POST' == $request->getMethod()){
 				$form->bind($request);
-				if($form->isValid()){
-					$datas = $form->getData();
-					$json = json_encode($datas);
-					if($json !== false){
-						file_put_contents($app['db.options.src'], $json);
-						$app['db.options'] = $datas;
-					}
-				}else $isErrorForm = true;
 				try{
+					if($form->isValid()){
+						$datas = $form->getData();
+						$json = json_encode($datas);
+						if($json !== false){
+							if(@file_put_contents($app['db.options.src'], $json)){
+								$app['db.options'] = $datas;
+							}else throw new Exception("Failed to write connection content in file: ".$app['db.options.src']."( please check the permission for this conf:".system('id').")");
+						}
+					}else $isErrorForm = true;
 					$installDone = $this->testDb($app);
 					$app['session']->getFlashBag()->add('info', 'Databse create');
 				}catch(Exception $e){

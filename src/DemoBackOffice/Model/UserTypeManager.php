@@ -4,6 +4,8 @@ namespace DemoBackOffice\Model{
 	use Silex\Application;
 	use Doctrine\DBAL\Connection;
 	use DemoBackOffice\Model\Entity\UserType;
+	use DemoBackOffice\Model\Entity\Section;
+	use DemoBackOffice\Model\Entity\AccessType;
 	use Exception;
 
 	class UserTypeManager{
@@ -20,6 +22,26 @@ namespace DemoBackOffice\Model{
 			}
 		}
 
+		private function getUserTypeAccess(UserType $userType){
+			$stmt =$this->db->executeQuery("SELECT id_type_access, id_section from access where id_type_user=?", array($userType->id));
+			if (!$accessType = $stmt->fetchall())  return array();
+		   return $accessType;	
+		}
+
+		/**
+		 * load all userType access
+		 */
+		protected function loadUserTypeAccess(UserType $userType){
+			$userType->purgeAccess();
+			if($userType->id > 0){
+				$accessType = $this->getUserTypeAccess($userType);
+				for ($i = 0; $i < count($accessType); $i++) {
+					$userType->addAccess($accessType[$i]['id_section'], new AccessType($accessType[$i]['id_type_access']));
+				}
+			}
+			return $userType;
+		}
+
 		/**
 		 * @throw exception if type_user asked not found
 		 */
@@ -30,7 +52,8 @@ namespace DemoBackOffice\Model{
 			else throw new Exception("Bad search parameters");
 			$stmt = $this->db->executeQuery($sql, array($value));
 			if(!$typeUser = $stmt->fetch()) return new UserType( "", "", "", "");
-			return new UserType($typeUser['id_type_user'], $typeUser['type_user'], $typeUser['description_type_user'], $typeUser['date']);
+			$user = new UserType($typeUser['id_type_user'], $typeUser['type_user'], $typeUser['description_type_user'], $typeUser['date']);
+			return $this->loadUserTypeAccess($user);
 		}
 
 		public function getUserTypeById($id){
@@ -41,7 +64,33 @@ namespace DemoBackOffice\Model{
 			return $this->searchUserType('name', $name);
 		}
 
-		public function saveUserType($name, $description, $new = false){
+		protected function saveUserTypeAccess(UserType $userType, $access){
+			if(count($access) > 0){
+				$rows = $this->getUserTypeAccess($userType);
+				for($i = 0, $oldUserType = array(); $i < count($rows); $i++) {
+					$oldUserType[$rows[$i]['id_section']] = $rows[$i]['id_type_access'];
+				}
+				$dateMaj = date('Y-m-d H:i:s');
+				foreach($access as $sectionId => $accessType){
+					//minimum right is to read
+					if($accessType->canRead()){
+						$params = array($accessType->type, date('Y-m-d H:i:s'), $sectionId, $userType->id);
+						if(!isset($oldUserType[$sectionId])){
+							$sql = "insert into access(date_creation_access, id_type_access, date_modification_access, id_section, id_type_user ) values (?,?,?,?,?)";
+							array_unshift($params, date('Y-m-d H:i:s'));
+						}else{
+							$sql = "update access set id_type_access=?, date_modification_access=? where id_section=? and id_type_user=?";
+						}
+						$this->db->executeQuery($sql, $params);
+					}	
+				}
+				$this->db->executeQuery( "delete from access where date_modification_access < ?", array($dateMaj));
+			}
+			$userType = $this->loadUserTypeAccess($userType);
+			return $userType;
+		}
+
+		public function saveUserType($name, $description, $access, $new = false){
 			$typeUser = $this->getUserTypeByName($name);
 			$typeUser->name = $name;
 			$typeUser->description = $description;
@@ -63,7 +112,7 @@ SQL;
 			}
 			$this->db->executequery($sql, $params);
 			if($typeUser == null) $typeUser = $this->getUserTypeByName($name);
-			return $typeUser; 
+			return $this->saveUserTypeAccess( $typeUser, $access); 
 		}
 
 		/**

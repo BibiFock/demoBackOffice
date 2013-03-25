@@ -12,6 +12,17 @@ namespace DemoBackOffice\Controller{
 
 	class ManageSectionController implements ControllerProviderInterface{
 
+		public function connect(Application $app){
+			// créer un nouveau controller basé sur la route par défaut
+			$index = $app['controllers_factory'];
+			$index->match("/",'DemoBackOffice\Controller\ManageSectionController::section')->bind("manage.sections");
+			$index->match("/edit/{name}",'DemoBackOffice\Controller\ManageSectionController::sectionEdit')->value('name', '')->bind("manage.sections.edit");
+			$index->match("/save/{name}",'DemoBackOffice\Controller\ManageSectionController::sectionSave')->value('name', '')->bind("manage.sections.save");
+			$index->match("/del/{id}",'DemoBackOffice\Controller\ManageSectionController::sectionDel')->assert('id', '[0-9]+')->bind("manage.sections.delete");
+
+			return $index;
+		}
+
 		public function sectionSave(Application $app, Request $request, $name){
 			return $this->sectionEdit($app, $request, $name, true);
 		}
@@ -90,16 +101,6 @@ namespace DemoBackOffice\Controller{
 			)); 
 		}
 
-		public function connect(Application $app){
-			// créer un nouveau controller basé sur la route par défaut
-			$index = $app['controllers_factory'];
-			$index->match("/",'DemoBackOffice\Controller\ManageSectionController::section')->bind("manage.sections");
-			$index->match("/edit/{name}",'DemoBackOffice\Controller\ManageSectionController::sectionEdit')->value('name', '')->bind("manage.sections.edit");
-			$index->match("/save/{name}",'DemoBackOffice\Controller\ManageSectionController::sectionSave')->value('name', '')->bind("manage.sections.save");
-			$index->match("/del/{id}",'DemoBackOffice\Controller\ManageSectionController::sectionDel')->assert('id', '[0-9]+')->bind("manage.sections.delete");
-
-			return $index;
-		}
 	}
 
 }

@@ -20,17 +20,28 @@
 
 						{{ form_label(form.description, 'Right description') }}
 						{{ form_widget(form.description) }}
-						{{ form_rest(form) }}
 						<br />
-						<button class="btn btn-button" >SAVE</button>
+						{% if sections|length > 0 %}
+						<table class="table table-striped table-hover table-condensed">
+							<thead>
+								<tr><th>Section</th><th>Rights</th></tr>
+							</thead>
+							<tbody>
+							{% for section in sections %}
+								<tr>
+									<td>{{ section.name }}</td>
+									<td> {{ form_widget(attribute(form, 'section_' ~ section.id)) }}	</td>
+								</tr>
+							{% endfor %}
+							</tbody>
+						</table>
+						{% else %}
+						<h5>no sections found please add <a href="{{ path('manage.sections') }}">sections</a></h5>
+						{% endif %}
+						{% if right.isSuperAdmin == false %}
+							<button class="btn btn-button"  >SAVE</button>
+						{% endif %}
+						{{ form_rest(form) }}
 					</form>
-					<table class="table table-striped table-hover table-condensed">
-						<thead>
-							<tr><th>Accès</th><th>update</th><th>statut</th></tr>
-						</thead>
-						<tbody>
-							<tr><td>admin</td><td>2012</td><td><select><option>EDIT</option></select></tr>
-						</tbody>
-					</table>
 					<a href=" {{ path('manage.rights') }}" class="btn btn-button text-right">SEE LIST</a>
 {% endblock %}

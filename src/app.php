@@ -26,6 +26,10 @@ $app->register(new TwigServiceProvider(), array(
 
 $app->register(new DoctrineServiceProvider());
 
+$app['manager.user'] = $app->share(function () use ($app) {
+	return new DemoBackOffice\Model\UserProvider($app);
+});
+
 $app->register(new SecurityServiceProvider(), array(
 	'security.firewalls' => array(
 		'manage' => array(
@@ -43,10 +47,7 @@ $app->register(new SecurityServiceProvider(), array(
 		        'target' => '/',
 			),
 			'anonymous' => false,
-			'users' => 
-				$app->share(function () use ($app) {
-					return new DemoBackOffice\Model\UserProvider($app);
-				})
+			'users' => $app['manager.user'],
 		),
 		'web' => array(
 			'pattern' => '^/',
@@ -61,6 +62,7 @@ $app->register(new SecurityServiceProvider(), array(
 $app['security.encoder.digest'] = $app->share(function ($app) {
     return new PlaintextPasswordEncoder();
 });
+
 
 $app['manager.section'] = $app->share(function () use ($app) {
 	return new DemoBackOffice\Model\SectionManager($app['db']);

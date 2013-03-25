@@ -1,27 +1,28 @@
 <?php    
 namespace DemoBackOffice\Model\Entity{
 	use Symfony\Component\Security\Core\User\UserInterface;
+	use DemoBackOffice\Model\Entity\UserType;
 
 	class User implements UserInterface
 	{
-		private $username;
-		private $password;
-		private $roles;
+		public $id, $username, $password, $type, $update;
 
-		public function __construct($username, $password,  array $roles)
+		public function __construct($id, $username, $password, UserType $type, $update)
 		{
+			$this->id = $id;
 			$this->username = $username;
 			$this->password = $password;
-			$this->roles = $roles;
+			$this->type = $type;
+			$this->update = $update;
 		}
 
-		public function isAdmin(){
-			return true;
+		public function isSuperAdmin(){
+			return $this->id == 1;
 		}
 
 		public function getRoles()
 		{
-			return $this->roles;
+			return array('ROLE_ADMIN');
 		}
 
 		public function getPassword()

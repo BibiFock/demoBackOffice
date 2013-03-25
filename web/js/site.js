@@ -89,7 +89,7 @@ var functions = {
 			var opts = fetchOptions( this ); 
 			var target = $('.hero-unit');
 			var formParams = $( this ).serialize();
-			functions.sendAjax('POST', opts.url, formParams, target)
+			functions.sendAjax('POST', opts.url, formParams, target);
 			return false;
 		});
 	},
@@ -98,7 +98,7 @@ var functions = {
 			if(confirm('Are you sure?')){
 				var opts = fetchOptions( this ); 
 				var target = $('.hero-unit');
-				functions.sendAjax('POST', opts.url, null, target)
+				functions.sendAjax('POST', opts.url, null, target);
 			}
 			return false;
 		});

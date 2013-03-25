@@ -7,6 +7,7 @@ namespace DemoBackOffice\Controller{
 	use Silex\ControllerCollection;
 	use Symfony\Component\Validator\Constraints as Assert;
 	use Symfony\Component\HttpFoundation\Request;
+	use DemoBackOffice\Model\Entity\AccessType;
 	use DemoBackOffice\Model\Entity\UserType;
 	use Exception;
 
@@ -37,18 +38,30 @@ namespace DemoBackOffice\Controller{
 			$isErrorForm = false;
 			$isNew = ($id == "");
 			$userType = $app['manager.rights']->getUserTypeById($id);
+			$sections = $app['manager.section']->loadSections();
 			$form = $app['form.factory']->createBuilder('form')
 				->add('name', 'text', array(
 					'data' => $userType->name,
+					'disabled' => $userType->isSuperAdmin(),
 					'constraints'  => array(
 						new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '50')),
 					)
 				))
 				->add('description', 'textarea',array(
 					'data' => $userType->description,
+					'disabled' => $userType->isSuperAdmin(),
 					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100')))
 				))
 				->getForm();
+			for ($i = 0; $i < count($sections); $i++) {
+				$form->add('section_'.$sections[$i]->id, 'choice', 
+					array(
+						'choices' => array(AccessType::$FORBIDDEN => 'Forbidden', AccessType::$READONLY => 'Readonly', AccessType::$EDIT => 'Manage'),
+						'data' => $userType->getAccessToSection($sections[$i]->id)->type,
+						'disabled' => $userType->isSuperAdmin(),
+					)
+				);
+			}
 			$jsonSaveUserType = array('url' => $app['url_generator']->generate('manage.rights.save', array('id' => $userType->id)));
 			if($request->isMethod('POST') && !$error){
 				$form->bind($request);
@@ -56,7 +69,13 @@ namespace DemoBackOffice\Controller{
 					$datas = $form->getData();
 					if($form->isValid()){
 						$datas = $form->getData();
-						$userType = $app['manager.rights']->saveUserType($datas['name'], $datas['description'], $isNew);
+						$access = array();
+						foreach($datas as $k=>$v){
+							if(preg_match('#^section_(\d+)#i', $k, $match) > 0){
+								$access[$match[1]] = new AccessType($v);
+							}
+						}
+						$userType = $app['manager.rights']->saveUserType($datas['name'], $datas['description'], $access, $isNew);
 						$app['session']->getFlashBag()->add('info', 'Rights '.$userType->name.' '.($isNew ? 'created' : 'updated'));
 						if($isNew) return $app->redirect($app['url_generator']->generate('manage.rights.edit', array('id' => $userType->id)));
 					}else $isErrorForm = true;
@@ -65,13 +84,14 @@ namespace DemoBackOffice\Controller{
 				}
 			}
 			
-			return $app['twig']->render('manage/rights-edit.html.twig', 
+			return $app['twig']->render('manage/user-edit.html.twig', 
 				array(
 					'form' => $form->createView(),
 					'ajax' => $ajax,
 					'error' => $error,
 					'isErrorForm' => $isErrorForm,
 					'right' => $userType,
+					'sections' => $sections,
 					'jsonSaveRight' => json_encode($jsonSaveUserType),
 					'isNew' => $isNew,
 				) 
