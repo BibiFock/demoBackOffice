@@ -7,7 +7,7 @@ namespace DemoBackOffice\Model\Entity{
 	{
 		public $id, $username, $password, $type, $update;
 
-		public function __construct($id, $username, $password, UserType $type, $update)
+		public function __construct($id, $username, $password, $type, $update)
 		{
 			$this->id = $id;
 			$this->username = $username;

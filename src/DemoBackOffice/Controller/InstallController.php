@@ -52,7 +52,7 @@ namespace DemoBackOffice\Controller{
 						if($json !== false){
 							if(@file_put_contents($app['db.options.src'], $json)){
 								$app['db.options'] = $datas;
-							}else throw new Exception("Failed to write connection content in file: ".$app['db.options.src']."( please check the permission for this conf:".system('id').")");
+							}else throw new Exception("Failed to write connection content in file: ".$app['db.options.src']."( please check the permission for this conf:".exec('id', $r).")");
 						}
 					}else $isErrorForm = true;
 					$installDone = $this->testDb($app);

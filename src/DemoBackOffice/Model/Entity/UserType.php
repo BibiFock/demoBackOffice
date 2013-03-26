@@ -24,7 +24,7 @@ namespace DemoBackOffice\Model\Entity{
 
 		public function getAccessToSection($sectionId){
 			if( isset($sections[$sectionId])) $accesType = $sections[$sectionId];
-			else $accessType = new AccessType();
+			else $accessType = new AccessType(AccessType::$FORBIDDEN);
 			if($this->isSuperAdmin() ) $accessType->setAdminMode();
 			return $accessType;
 		}
@@ -33,10 +33,6 @@ namespace DemoBackOffice\Model\Entity{
 			return ($this->id == 1);
 		}
 
-		public function canDelete(){
-			//if the group isn't a super admin
-			return (!$this->id > 2); 
-		}
 	}
 
 }

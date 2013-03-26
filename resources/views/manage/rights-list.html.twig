@@ -23,7 +23,7 @@
 								<td>{{ right.description }}</td>
 								<td>
 									<a class="btn btn-small" href="{{ path('manage.rights.edit', {'id':right.id})}}" >EDIT</a>
-									{% if right.canDelete() %}
+									{% if right.isSuperAdmin() == false %}
 									<button class="btn btn-small" data-role="delSection" data-options="{&quot;url&quot;: &quot;{{ path('manage.rights.delete',  {'id': right.id }) }}&quot;}">DELETE</a>
 									{% endif %}
 								</td>

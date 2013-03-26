@@ -4,11 +4,11 @@ namespace DemoBackOffice\Model{
 	use Silex\Application;
 	use Symfony\Component\Security\Core\User\UserProviderInterface;
 	use Symfony\Component\Security\Core\User\UserInterface;
-	//use Symfony\Component\Security\Core\User\User;
 	use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 	use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-	use Exception;
+	use DemoBackOffice\Model\Entity\UserType;
 	use DemoBackOffice\Model\Entity\User;
+	use Exception;
 
 	class UserProvider implements UserProviderInterface{
 
@@ -28,7 +28,7 @@ namespace DemoBackOffice\Model{
 			if($by == "id") $sql .= " id_user=?";
 			else $sql .= " login_user=?";
 			$stmt = $this->app['db']->executeQuery( $sql, array($value));
-			if (!$user = $stmt->fetch()) return User("", "", "", null, "" );
+			if (!$user = $stmt->fetch()) return new User("", "", "", null, "" );
 			$userType = $this->app['manager.rights']->getUserTypeById($user['id_type_user']);
 			return new User($user['id_user'], $user['login_user'], $user['password_user'], $userType, $user['date_modification_user']);
 		}
@@ -38,7 +38,7 @@ namespace DemoBackOffice\Model{
 		}
 
 		public function getUserByName($name){
-			return $this->searchUser('name', $id);
+			return $this->searchUser('name', $name);
 		}
 
 		public function saveUser($login, $password, $userType, $new = false){

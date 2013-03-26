@@ -22,7 +22,9 @@
 								<td>{{ section.update }}</td>
 								<td>
 									<a class="btn btn-small" href="{{ path('manage.sections.edit', {'name':section.name})}}" >EDIT</a>
+								{% if section.canBeDelete() %}
 									<button class="btn btn-small" data-role="delSection" data-options="{&quot;url&quot;: &quot;{{ path('manage.sections.delete',  {'id': section.id }) }}&quot;}">DELETE</a>
+								{% endif %}
 								</td>
 							</tr>
 						{% endfor %}

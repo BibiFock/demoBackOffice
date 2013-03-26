@@ -17,9 +17,9 @@ namespace DemoBackOffice\Model{
 		}
 
 		public function deleteUserType(UserType $userType){
-			if($userType->canDelete()){
+			if(!$userType->isSuperAdmin()){
 				$stmt = $this->db->executeQuery("delete from type_user where id_type_user=?", array( $userType->id));
-			}
+			}else throw new Exception('You can\'t delete this right');
 		}
 
 		private function getUserTypeAccess(UserType $userType){

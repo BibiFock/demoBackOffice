@@ -15,20 +15,22 @@ namespace DemoBackOffice\Model{
 		}
 
 		public function deleteSection(Section $section){
-			$stmt = $this->db->executeQuery("delete from section where id_section=?", array( $section->id));
+			if($section->canBeDelete()){
+				$stmt = $this->db->executeQuery("delete from section where id_section=?", array( $section->id));
+			}else throw new Exception("You cannot delete this section");
 		}
 
 		/**
 		 * @throw exception if section asked not found
 		 */
 		private function searchSection($by, $value){
-			$sql = "select id_section, name_section, DATE_FORMAT( date_modification_section,  '%Y-%m-%d %h:%i:%s' ) date, content_section FROM section where";
+			$sql = "select id_section, name_section, DATE_FORMAT( date_modification_section,  '%Y-%m-%d %h:%i:%s' ) date, content_section, id_status_section FROM section where";
 			if($by == "id") $sql .= " id_section=?";
 			else if($by == "name") $sql .= " name_section=?";
 			else throw new Exception("Bad search parameters");
 			$stmt = $this->db->executeQuery($sql, array($value));
-			if(!$section = $stmt->fetch()) return new Section( "", "", "", "");
-			return new Section($section['id_section'], $section['name_section'], $section['date'], $section['content_section']);
+			if(!$section = $stmt->fetch()) return new Section( "", "", "", "", "");
+			return new Section($section['id_section'], $section['name_section'], $section['date'], $section['content_section'], $section['id_status_section']);
 		}
 
 		public function getSectionById($id){
@@ -68,10 +70,10 @@ SQL;
 		 *	return a section list
 		 */
 		public function loadsections(){
-			$stmt = $this->db->executequery('select id_section, name_section, date_modification_section, content_section from section order by name_section asc');
+			$stmt = $this->db->executequery('select id_section, name_section, date_modification_section, content_section, id_status_section from section order by name_section asc');
 			if (!$sections = $stmt->fetchall())  return array(); 
 			for ($i = 0; $i < count($sections); $i++) {
-				$sections[$i] = new Section($sections[$i]['id_section'], $sections[$i]['name_section'], $sections[$i]['date_modification_section'], $sections[$i]['content_section']);
+				$sections[$i] = new Section($sections[$i]['id_section'], $sections[$i]['name_section'], $sections[$i]['date_modification_section'], $sections[$i]['content_section'], $sections[$i]['id_status_section']);
 			}
 			return $sections;
 		}

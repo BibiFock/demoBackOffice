@@ -3,13 +3,18 @@ namespace DemoBackOffice\Model\Entity{
 
 	class Section{
 
-		public $id, $name, $update, $content;
+		public $id, $name, $update, $content, $status;
 
-		public function __construct($id, $name, $update, $content){
+		public function __construct($id, $name, $update, $content, $status){
 			$this->id = $id;
 			$this->name = $name; 
 			$this->update = $update;
 			$this->content = $content;
+			$this->status = $status;
+		}
+
+		public function canBeDelete(){
+			return ($this->status < 2);
 		}
 
 	}
