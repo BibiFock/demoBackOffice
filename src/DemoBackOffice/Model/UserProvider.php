@@ -44,10 +44,11 @@ namespace DemoBackOffice\Model{
 		public function saveUser($login, $password, $userType, $new = false){
 			$user = $this->getUserByName($login);
 			$user->update = date('Y-m-d H:i:s');
-			$params = array($login, $password, $userType, $user->update);
+			$params = array($login, $password, $user->update, $userType );
 			if($user->id != ''){
 				if($new) throw new Exception('Username already used');
 				$sql = "update user set login_user=?, password_user=?, date_modification_user=?, id_type_user=? where id_user=?";
+				$params[] = $user->id;
 			}else{
 				array_unshift( $params, $this->update);
 				$sql = "insert into user(date_creation_user, login_user, password_user, date_modification_user, id_type_user) VALUES(?,?,?,?,?)";

@@ -1,0 +1,33 @@
+
+{% extends (ajax ? 'ajax.html.twig' : 'layout.html.twig' ) %}
+{% set active = 'users' %}
+
+{% block content %}
+					<h3>{{ user ? 'Edit' : 'Create' }} a user</h3>
+    				<form action="{{ path('manage.users.edit') }}" method="post" {{ isNew ? '' : 'data-role="saveForm"' }} data-options="{{ jsonSaveUser }}" {{ form_enctype(form) }} class="form-horizontal">
+						{% if error or isErrorForm %}
+					        <div class="alert alert-error">
+					            {% if isErrorForm %}
+									{{ form_errors(form.name) }}
+									{{ form_errors(form.content) }}
+					            {% else %}
+									{{ error }}
+					            {% endif %}
+					        </div>
+					    {% endif %}
+
+						{{ form_label(form.username, 'User name') }}
+						{{ form_widget(form.username) }}
+
+						{{ form_label(form.password, 'User password') }}
+						{{ form_widget(form.password) }}
+
+						{{ form_label(form.right, 'User password') }}
+						{{ form_widget(form.right) }}
+
+						{{ form_rest(form) }}
+						<br />
+						<button class="btn btn-button" >SAVE</button>
+					</form>
+					<a href=" {{ path('manage.users') }}" class="btn btn-button text-right">SEE LIST</a>
+{% endblock %}
