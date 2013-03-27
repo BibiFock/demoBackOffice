@@ -50,10 +50,11 @@ namespace DemoBackOffice\Controller{
 				$tmp[$rights[$i]->id] = $rights[$i]->name;
 			}
 			$rights = $tmp;
+			$disabled = $user->isSuperAdmin();
 			$form = $app['form.factory']->createBuilder('form')
 				->add('username', 'text', array(
 					'data' => $user->username,
-					'disabled' => $user->isSuperAdmin(),
+					'disabled' => $disabled,
 					'constraints'  => array(
 						new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '50')),
 						new Assert\Regex(array(
@@ -70,7 +71,7 @@ namespace DemoBackOffice\Controller{
 				->add('right', 'choice', array(
 					'choices' => $rights,
 					'data' => ($user->type != null ? $user->type->id: ''),
-					'disabled' => $user->isSuperAdmin()
+					'disabled' => $disabled
 				))
 				->getForm();
 			$jsonSaveUser = array('url' => $app['url_generator']->generate('manage.users.save', array('name' => $user->username)));
@@ -80,7 +81,11 @@ namespace DemoBackOffice\Controller{
 					$datas = $form->getData();
 					if($form->isValid()){
 						$datas = $form->getData();
-						$user = $app['manager.user']->saveUser($datas['username'], $datas['password'], $datas['right'], $isNew);
+						if($user->isSuperAdmin()){
+							$user = $app['manager.user']->changePassword($user->id, $datas['password']);
+						}else{
+							$user = $app['manager.user']->saveUser($datas['username'], $datas['password'], $datas['right'], $isNew);
+						}
 						$app['session']->getFlashBag()->add('info', 'User '.$user->username.' '.($isNew ? 'created' : 'updated'));
 						if($isNew) return $app->redirect($app['url_generator']->generate('manage.users.edit', array('name' => $user->username)));
 					}else $isErrorForm = true;

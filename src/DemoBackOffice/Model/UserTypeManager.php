@@ -18,6 +18,7 @@ namespace DemoBackOffice\Model{
 
 		public function deleteUserType(UserType $userType){
 			if(!$userType->isSuperAdmin()){
+				//TODO check if user have right yet
 				$stmt = $this->db->executeQuery("delete from type_user where id_type_user=?", array( $userType->id));
 			}else throw new Exception('You can\'t delete this right');
 		}
@@ -51,8 +52,8 @@ namespace DemoBackOffice\Model{
 			else if($by == "name") $sql .= " type_user=?";
 			else throw new Exception("Bad search parameters");
 			$stmt = $this->db->executeQuery($sql, array($value));
-			if(!$typeUser = $stmt->fetch()) return new UserType( "", "", "", "");
-			$user = new UserType($typeUser['id_type_user'], $typeUser['type_user'], $typeUser['description_type_user'], $typeUser['date']);
+			if(!$userType = $stmt->fetch()) return new UserType( "", "", "", "");
+			$user = new UserType($userType['id_type_user'], $userType['type_user'], $userType['description_type_user'], $userType['date']);
 			return $this->loadUserTypeAccess($user);
 		}
 
@@ -90,19 +91,21 @@ namespace DemoBackOffice\Model{
 			return $userType;
 		}
 
-		public function saveUserType($name, $description, $access, $new = false){
-			$typeUser = $this->getUserTypeByName($name);
-			$typeUser->name = $name;
-			$typeUser->description = $description;
-			$typeUser->update = date('Y-m-d H:i:s');
-			if($typeUser->id != ''){
-				if($new) throw new Exception('Type user name already used');
+		public function saveUserType($id, $name, $description, $access, $new = false){
+			$userType = $this->getUserTypeByName($name);
+			$userType->name = $name;
+			$userType->description = $description;
+			$userType->update = date('Y-m-d H:i:s');
+			if($userType->id != '' || $id != ''){
+				if($new || ($userType-> id != '' && $userType->id != $id)) throw new Exception('Name:"'.$name.'" already used for another right');
+				$userType->id = $id;
+				if($userType->isSuperAdmin()) throw new Exception('This is admin right it cannot be updated');
 				$sql = <<<SQL
 update type_user 
 set type_user=?, date_modification_type_user=?, description_type_user=?
 where id_type_user=?
 SQL;
-				$params = array( $typeUser->name, $typeUser->update, $typeUser->description, $typeUser->id);
+				$params = array( $userType->name, $userType->update, $userType->description, $userType->id);
 			}else{
 				$sql = <<<SQL
 insert into type_user (type_user, date_creation_type_user, date_modification_type_user, description_type_user) 
@@ -111,8 +114,8 @@ SQL;
 				$params = array( $name, $description);
 			}
 			$this->db->executequery($sql, $params);
-			if($typeUser == null) $typeUser = $this->getUserTypeByName($name);
-			return $this->saveUserTypeAccess( $typeUser, $access); 
+			if($userType == null) $userType = $this->getUserTypeByName($name);
+			return $this->saveUserTypeAccess( $userType, $access); 
 		}
 
 		/**
@@ -120,11 +123,11 @@ SQL;
 		 */
 		public function loadUserTypes(){
 			$stmt = $this->db->executequery('select id_type_user, type_user, date_modification_type_user, description_type_user from type_user order by type_user asc');
-			if (!$typeUsers = $stmt->fetchall())  return array(); 
-			for ($i = 0; $i < count($typeUsers); $i++) {
-				$typeUsers[$i] = new UserType($typeUsers[$i]['id_type_user'], $typeUsers[$i]['type_user'], $typeUsers[$i]['description_type_user'], $typeUsers[$i]['date_modification_type_user']);
+			if (!$userTypes = $stmt->fetchall())  return array(); 
+			for ($i = 0; $i < count($userTypes); $i++) {
+				$userTypes[$i] = new UserType($userTypes[$i]['id_type_user'], $userTypes[$i]['type_user'], $userTypes[$i]['description_type_user'], $userTypes[$i]['date_modification_type_user']);
 			}
-			return $typeUsers;
+			return $userTypes;
 		}
 
 	}

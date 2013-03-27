@@ -7,8 +7,8 @@ namespace DemoBackOffice\Controller{
 	use Silex\ControllerCollection;
 	use Symfony\Component\Validator\Constraints as Assert;
 	use Symfony\Component\HttpFoundation\Request;
-	use DemoBackOffice\Model\Entity\AccessType;
 	use DemoBackOffice\Model\Entity\UserType;
+	use DemoBackOffice\Model\Entity\AccessType;
 	use Exception;
 
 	class ManageUserTypeController implements ControllerProviderInterface{
@@ -53,6 +53,7 @@ namespace DemoBackOffice\Controller{
 					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100')))
 				))
 				->getForm();
+
 			for ($i = 0; $i < count($sections); $i++) {
 				$form->add('section_'.$sections[$i]->id, 'choice', 
 					array(
@@ -75,7 +76,7 @@ namespace DemoBackOffice\Controller{
 								$access[$match[1]] = new AccessType($v);
 							}
 						}
-						$userType = $app['manager.rights']->saveUserType($datas['name'], $datas['description'], $access, $isNew);
+						$userType = $app['manager.rights']->saveUserType($userType->id, $datas['name'], $datas['description'], $access, $isNew);
 						$app['session']->getFlashBag()->add('info', 'Rights '.$userType->name.' '.($isNew ? 'created' : 'updated'));
 						if($isNew) return $app->redirect($app['url_generator']->generate('manage.rights.edit', array('id' => $userType->id)));
 					}else $isErrorForm = true;
@@ -84,7 +85,7 @@ namespace DemoBackOffice\Controller{
 				}
 			}
 			
-			return $app['twig']->render('manage/user-edit.html.twig', 
+			return $app['twig']->render('manage/rights-edit.html.twig', 
 				array(
 					'form' => $form->createView(),
 					'ajax' => $ajax,
@@ -98,8 +99,17 @@ namespace DemoBackOffice\Controller{
 			); 
 		}
 
-		public function userTypeDel(Application $app, Request $request, $id, $ajax = false){
-			return "okidel";
+		public function userTypeDel(Application $app, Request $request, $id){
+			if($id != "" && $request->isMethod('POST')){ 
+				try{
+					$userType = $app['manager.rights']->getUserTypeById($id);
+					if($userType->id != '') $app['manager.rights']->deleteUserType($userType);
+					$app['session']->getFlashBag()->add('info', 'Section '.$userType->name.' deleted');
+				}catch(Exception $e){
+					$app['session']->getFlashBag()->add('error', 'delete error:'.$e->getMessage());
+				}
+			}
+			return $this->userType($app, true);
 		}
 
 		public function userTypeSave(Application $app, Request $request, $id){

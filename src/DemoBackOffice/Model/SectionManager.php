@@ -15,7 +15,7 @@ namespace DemoBackOffice\Model{
 		}
 
 		public function deleteSection(Section $section){
-			if($section->canBeDelete()){
+			if(!$section->isAdminSection()){
 				$stmt = $this->db->executeQuery("delete from section where id_section=?", array( $section->id));
 			}else throw new Exception("You cannot delete this section");
 		}
@@ -46,8 +46,10 @@ namespace DemoBackOffice\Model{
 			$section->name = $name;
 			$section->content = $content;
 			$section->update = date('Y-m-d H:i:s');
+			//TODO Check if user have this right
 			if($section->id != ''){
 				if($new) throw new Exception('Section name already used');
+				if($section->isAdminSection()) throw new Exception('Locked section');
 				$sql = <<<SQL
 update section 
 set name_section=?, date_modification_section=?, content_section=?

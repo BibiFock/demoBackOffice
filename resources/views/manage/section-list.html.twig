@@ -21,9 +21,11 @@
 								<td>{{ section.name }}</td>
 								<td>{{ section.update }}</td>
 								<td>
+								{% if section.isAdminSection() == false %}
 									<a class="btn btn-small" href="{{ path('manage.sections.edit', {'name':section.name})}}" >EDIT</a>
-								{% if section.canBeDelete() %}
 									<button class="btn btn-small" data-role="delSection" data-options="{&quot;url&quot;: &quot;{{ path('manage.sections.delete',  {'id': section.id }) }}&quot;}">DELETE</a>
+								{% else %}
+								--
 								{% endif %}
 								</td>
 							</tr>

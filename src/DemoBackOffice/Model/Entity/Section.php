@@ -13,8 +13,8 @@ namespace DemoBackOffice\Model\Entity{
 			$this->status = $status;
 		}
 
-		public function canBeDelete(){
-			return ($this->status < 2);
+		public function isAdminSection(){
+			return ($this->status == 2);
 		}
 
 	}

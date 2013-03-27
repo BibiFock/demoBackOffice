@@ -41,10 +41,20 @@ namespace DemoBackOffice\Model{
 			return $this->searchUser('name', $name);
 		}
 
+		public function changePassword($id, $password){
+			$user = $this->getUserById($id);
+			if($user->id == $id){
+				$user->password = $password;
+				$this->app['db']->executeQuery("update user set password_user = ? where id_user=?", array($user->id, $user->password));
+				return $user;
+			}else throw new Exception('unfound user');
+		}
+
 		public function saveUser($login, $password, $userType, $new = false){
 			$user = $this->getUserByName($login);
 			$user->update = date('Y-m-d H:i:s');
 			$params = array($login, $password, $user->update, $userType );
+			//TODO review algo update user like for usertype
 			if($user->id != ''){
 				if($new) throw new Exception('Username already used');
 				$sql = "update user set login_user=?, password_user=?, date_modification_user=?, id_type_user=? where id_user=?";
