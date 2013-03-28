@@ -6,10 +6,16 @@ namespace DemoBackOffice\Model{
 	use DemoBackOffice\Model\Entity\Section;
 	use Exception;
 
+	/**
+	 * handle access in database for section 
+	 */
 	class SectionManager{
-
+		//connection
 		protected $db;
 
+		/**
+		 * @param connection connection
+		 */
 		public function __construct(Connection $connection){
 			$this->db = $connection;
 		}
@@ -21,6 +27,10 @@ namespace DemoBackOffice\Model{
 		}
 
 		/**
+		 * search section by name or id
+		 * @param	string	('id' or 'name')
+		 * @param	string	value
+		 * @return Section
 		 * @throw exception if section asked not found
 		 */
 		private function searchSection($by, $value){
@@ -33,14 +43,28 @@ namespace DemoBackOffice\Model{
 			return new Section($section['id_section'], $section['name_section'], $section['date'], $section['content_section'], $section['id_status_section']);
 		}
 
+		/**
+		 * get a section by is id
+		 * @param string
+		 */
 		public function getSectionById($id){
 			return $this->searchSection('id', $id);
 		}
 
+		/**
+		 * get a section by is id
+		 * @param string
+		 */
 		public function getSectionByName($name){
 			return $this->searchSection('name', $name);
 		}
 
+		/**
+		 * update a section content
+		 * @param string id
+		 * @param string content
+		 * @return section
+		 */
 		public function saveSectionContent($id, $content){
 			$section = $this->getSectionById($id);
 			if($section->id != ''){
@@ -49,6 +73,14 @@ namespace DemoBackOffice\Model{
 			return $section;
 		}
 
+		/**
+		 * save a section
+		 * @param	string id
+		 * @param	string name
+		 * @param	string content
+		 * @param	bool new(optional, default = false)
+		 * @return 	Section
+		 */
 		public function saveSection($id, $name, $content, $new = false){
 			$section = $this->getSectionByName($name);
 			$section->name = $name;
@@ -78,6 +110,9 @@ SQL;
 
 		/**
 		 *	return a section list
+		 *	@param bool sortByDescType
+		 *	@param bool	withoutAdminSection
+		 *	@return array(<Section>)
 		 */
 		public function loadSections( $sortByDescType = false, $withoutAdminSection = false){
 			$stmt = $this->db->executequery('select id_section, name_section, date_modification_section, content_section, id_status_section from section '.($withoutAdminSection ? 'where id_status_section < 2 ' : '').' order by '.($sortByDescType  ? 'id_satus_section desc, ' : '').'name_section asc');

@@ -11,8 +11,16 @@ namespace DemoBackOffice\Controller{
 	use DemoBackOffice\Model\Entity\AccessType;
 	use Exception;
 
+	/**
+	 * handle right management
+	 */
 	class ManageUserTypeController extends ManageController{
+		//section name
 		private $sectionName = 'rights';
+
+		/**
+		 * define routing
+		 */
 		public function connect(Application $app){
 			// créer un nouveau controller basé sur la route par défaut
 			$index = $app['controllers_factory'];
@@ -24,6 +32,9 @@ namespace DemoBackOffice\Controller{
 			return $index;
 		}
 
+		/**
+		 * home of the section aff the list of right
+		 */
 		public function userType(Application $app, $ajax = false){
 			$access = $this->checkAccess($app, $this->sectionName);
 			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
@@ -38,16 +49,24 @@ namespace DemoBackOffice\Controller{
 			)); 
 		}
 
+		/**
+		 * form edit right
+		 *
+		 */
 		public function userTypeEdit(Application $app, Request $request, $id, $ajax = false){
+			//check access
 			$access = $this->checkAccess($app, $this->sectionName);
 			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
-
+			//init var
 			$error = false;
 			$isErrorForm = false;
 			$isNew = ($id == "");
+			//get infos
 			$userType = $app['manager.rights']->getUserTypeById($id);
 			$sections = $app['manager.section']->loadSections();
+			//check if the current user can edit
 			$readonly = $userType->isSuperAdmin() || !$access->canEdit();
+			//create form
 			$form = $app['form.factory']->createBuilder('form')
 				->add('name', 'text', array(
 					'data' => $userType->name,
@@ -67,7 +86,7 @@ namespace DemoBackOffice\Controller{
 					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100')))
 				))
 				->getForm();
-
+			//create section form list
 			for ($i = 0; $i < count($sections); $i++) {
 				$form->add('section_'.$sections[$i]->id, 'choice', 
 					array(
@@ -77,7 +96,9 @@ namespace DemoBackOffice\Controller{
 					)
 				);
 			}
+			//json url request for the ajax request
 			$jsonSaveUserType = array('url' => $app['url_generator']->generate('manage.rights.save', array('id' => $userType->id)));
+			//handle form request
 			if($request->isMethod('POST') && !$error){
 				$form->bind($request);
 				try{
@@ -85,12 +106,15 @@ namespace DemoBackOffice\Controller{
 					if($form->isValid()){
 						$datas = $form->getData();
 						$access = array();
+						//generate access
 						foreach($datas as $k=>$v){
 							if(preg_match('#^section_(\d+)#i', $k, $match) > 0){
 								$access[$match[1]] = new AccessType($v);
 							}
 						}
+						//save right infos
 						$userType = $app['manager.rights']->saveUserType($userType->id, $datas['name'], $datas['description'], $access, $isNew);
+						//aff result message
 						$app['session']->getFlashBag()->add('info', 'Rights '.$userType->name.' '.($isNew ? 'created' : 'updated'));
 						if($isNew) return $app->redirect($app['url_generator']->generate('manage.rights.edit', array('id' => $userType->id)));
 					}else $isErrorForm = true;
@@ -114,9 +138,15 @@ namespace DemoBackOffice\Controller{
 			); 
 		}
 
+		/**
+		 * Right delete
+		 *
+		 */
 		public function userTypeDel(Application $app, Request $request, $id){
+			//check access
 			$access = $this->checkAccess($app, $this->sectionName);
 			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
+			//handle form request
 			if($id != "" && $request->isMethod('POST')){ 
 				try{
 					//check is there is no user with this type
@@ -129,7 +159,10 @@ namespace DemoBackOffice\Controller{
 			}
 			return $this->userType($app, true);
 		}
-
+		
+		/**
+		 * save right infos request
+		 */
 		public function userTypeSave(Application $app, Request $request, $id){
 			return $this->userTypeEdit($app, $request, $id, true);
 		}

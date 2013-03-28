@@ -13,6 +13,9 @@ namespace DemoBackOffice\Model\Entity{
 			$this->status = $status;
 		}
 
+		/**
+		 * if section is an admin section
+		 */
 		public function isAdminSection(){
 			return ($this->status == 2);
 		}

@@ -10,6 +10,10 @@ namespace DemoBackOffice\Model{
 	use DemoBackOffice\Model\Entity\User;
 	use Exception;
 
+	/**
+	 * Handle user db request
+	 * implements UserProviderInterface for handle connection for the security.firewall
+	 */
 	class UserProvider implements UserProviderInterface{
 
 		protected $app;
@@ -18,11 +22,21 @@ namespace DemoBackOffice\Model{
 			$this->app = $app;
 		}
 
+		/**
+		 * delete User
+		 * @param User user
+		 */
 		public function deleteUser(User $user){
 			if($user->isSuperAdmin()) throw new Exception('You cannot delete root account');
 			$stmt = $this->app['db']->executeQuery("delete from user where id_user=?", array( $user->id ));
 		}
 
+		/**
+		 * search user
+		 * @param	string	by
+		 * @param	string	value
+		 * @return User
+		 */
 		protected function searchUser($by, $value){
 			$sql = 'SELECT id_user, login_user, password_user, id_type_user, date_modification_user from user where ';
 			if($by == "id") $sql .= " id_user=?";
@@ -33,14 +47,27 @@ namespace DemoBackOffice\Model{
 			return new User($user['id_user'], $user['login_user'], $user['password_user'], $userType, $user['date_modification_user']);
 		}
 
+		/**
+		 * get User by id
+		 * @param	string	id
+		 * @return	User
+		 */
 		public function getUserById($id){
 			return $this->searchUser('id', $id);
 		}
 
+		/**
+		 * get User by name
+		 * @param	string	name
+		 * @return	User
+		 */
 		public function getUserByName($name){
 			return $this->searchUser('name', $name);
 		}
 
+		/**
+		 * change user password (for admin)
+		 */
 		public function changePassword($id, $password){
 			$user = $this->getUserById($id);
 			if($user->id == $id){
@@ -50,6 +77,15 @@ namespace DemoBackOffice\Model{
 			}else throw new Exception('unfound user');
 		}
 
+		/**
+		 * save user
+		 * @param	string	id
+		 * @param	string	login
+		 * @param	string	password
+		 * @param	string	userType
+		 * @param	bool	new
+		 * @return	User
+		 */
 		public function saveUser($id, $login, $password, $userType, $new = false){
 			$user = $this->getUserByName($login);
 			$user->update = date('Y-m-d H:i:s');
@@ -69,6 +105,7 @@ namespace DemoBackOffice\Model{
 
 		/**
 		 *	return a type_user list
+		 *	@return	array(<User>)
 		 */
 		public function loadUsers(){
 			$stmt = $this->app['db']->executequery('SELECT id_user, login_user, password_user, id_type_user, date_modification_user from user');
@@ -82,7 +119,9 @@ namespace DemoBackOffice\Model{
 		}
 
 		/**
-		 * load all userType access
+		 * load all userType access return all right access
+		 * @param Usertype
+		 * @return Usertype
 		 */
 		protected function loadUserTypeAccess(UserType $userType){
 			$userType->purgeAccess();
@@ -95,7 +134,8 @@ namespace DemoBackOffice\Model{
 			return $userType;
 		}
 
-		/** UserProviderInterface * */
+		/** UserProviderInterface **/
+		/** interface user by security.firewall to connect a user **/
 		public function loadUserByUsername($username){
 			$user =  $this->searchUser('name', $username);
 			if ($user->id == null) {
@@ -104,7 +144,6 @@ namespace DemoBackOffice\Model{
 			$user->loadSections($this->app['manager.section']->loadSections());
 			return $user;
 		}
-	
 
 		function refreshUser(UserInterface $user) {
 			if (!$user instanceof User) {

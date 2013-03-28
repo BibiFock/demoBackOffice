@@ -10,6 +10,7 @@ namespace DemoBackOffice\Controller{
 
 	class InstallController implements ControllerProviderInterface{
 
+		//create and insert default field in db
 		private function testDb(Application $app){
 			$options = $app['db.options'];
 			$dbname = $options['dbname'];
@@ -24,7 +25,7 @@ namespace DemoBackOffice\Controller{
 			return true;
 		}
 	
-
+		//define routing
 		public function connect(Application $app){
 			// créer un nouveau controller basé sur la route par défaut
 			$index = $app['controllers_factory'];
@@ -33,8 +34,10 @@ namespace DemoBackOffice\Controller{
 		}
 
 		
+		//formulaire creation base
 		public function index(Application $app, Request $request){
 			$isErrorForm = false;
+			//define form
 			$form = $app['form.factory']->createBuilder('form')
 				->add('driver', 'text', array('data' => $app['db.options']['driver']))
 				->add('host', 'text', array('data' => $app['db.options']['host']))
@@ -43,10 +46,13 @@ namespace DemoBackOffice\Controller{
 				->add('password', 'text', array('data' => $app['db.options']['password'], 'required' => false))
 				->getForm();
 			$installDone = false;
+
 			if('POST' == $request->getMethod()){
+				//if a post
 				$form->bind($request);
 				try{
 					if($form->isValid()){
+						//if form valid
 						$datas = $form->getData();
 						$json = json_encode($datas);
 						if($json !== false){
@@ -60,8 +66,8 @@ namespace DemoBackOffice\Controller{
 				}catch(Exception $e){
 					$app['session']->getFlashBag()->add('error', 'Database Error'.$e->getMessage());
 				}
-
 			}	
+			//return result
 			return $app['twig']->render('install.html.twig', array(
 				'form'  => $form->createView(),
 				'isErrorForm' => $isErrorForm,

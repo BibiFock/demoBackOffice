@@ -10,13 +10,20 @@ namespace DemoBackOffice\Controller{
 	use DemoBackOffice\Model\Entity\Section;
 	use Exception;
 
+	/**
+	 * Controller part admin Sections
+	 * take care of insert/update/delete of sections
+	 */
 	class ManageSectionController extends ManageController{
+		//for the right
 		private $sectionName = 'sections';
 
+		//define routing
 		public function connect(Application $app){
 			// créer un nouveau controller basé sur la route par défaut
 			$index = $app['controllers_factory'];
 			$index->match("/",'DemoBackOffice\Controller\ManageSectionController::index')->bind("manage.sections");
+			//we define routing and add a verification for the id: only number
 			$index->match("/edit/{id}",'DemoBackOffice\Controller\ManageSectionController::sectionEdit')->assert('id', '[0-9]+')->value('id', '')->bind("manage.sections.edit");
 			$index->match("/save/{id}",'DemoBackOffice\Controller\ManageSectionController::sectionSave')->assert('id', '[0-9]+')->value('id', '')->bind("manage.sections.save");
 			$index->match("/del/{id}",'DemoBackOffice\Controller\ManageSectionController::sectionDel')->assert('id', '[0-9]+')->bind("manage.sections.delete");
@@ -24,11 +31,18 @@ namespace DemoBackOffice\Controller{
 			return $index;
 		}
 
+		/**
+		 * save form
+		 */
 		public function sectionSave(Application $app, Request $request, $id){
 			return $this->sectionEdit($app, $request, $id, true);
 		}
 
+		/**
+		 * delete request
+		 */
 		public function sectionDel(Application $app, Request $request, $id){
+			//check access
 			$access = $this->checkAccess($app, $this->sectionName);
 			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
 			if($id != "" && $request->isMethod('POST')){ 
@@ -43,17 +57,27 @@ namespace DemoBackOffice\Controller{
 			return $this->index($app, true);
 		}
 
+		/**
+		 * section edition
+		 * generate form and handle the response
+		 */
 		public function sectionEdit(Application $app, Request $request, $id, $ajax = false){
+			//variable init
 			$error = false;
 			$isErrorForm = false;
+			//if request come from a user section
 			$fromUser = $request->get('from') == 'user';
 			if(!$ajax) $ajax = $fromUser;
 			$isNew = ($id == "");
+			//get the section access
 			$section = $app['manager.section']->getSectionByid($id);
 			$sectionName = ($fromUser ? $section->name : $this->sectionName);
 			$access = $this->checkAccess($app, $sectionName);
+			//if authentified user can read this page we redirect him
 			if(!$access->canRead()) return $this->section($app, $sectionName, true);
+			//check if user can edit the field
 			$readonly = !$access->canEdit();
+			//generate some constraint for name
 			$nameOptions = array(
 					'data' => $section->name,
 					'disabled' => ($readonly || $fromUser),
@@ -66,7 +90,9 @@ namespace DemoBackOffice\Controller{
 						))
 					)
 				);
+			//if from form user, we erased the constraint because user can't rename a section
 			if($fromUser) unset($nameOptions['constraints']);
+			//generate end of the form
 			$form = $app['form.factory']->createBuilder('form')
 				->add('name', 'text', $nameOptions)
 				->add('content', 'textarea',array(
@@ -75,17 +101,19 @@ namespace DemoBackOffice\Controller{
 					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100')))
 				))
 				->getForm();
-
+			//generate section save url
 			$jsonSaveSection = array('url' => $app['url_generator']->generate('manage.sections.save', array('id' => $section->id)));
+			//handle form submit
 			if($request->isMethod('POST') && !$error){
 				$form->bind($request);
 				try{
 					$datas = $form->getData();
-					if($form->isValid()){
+					if($form->isValid()){ // form valid
 						$datas = $form->getData();
-						if(!isset($datas['name'])){ 
+						if(!isset($datas['name'])){ //from user (form with no name
 							$section = $app['manager.section']->saveSectionContent($section->id, $datas['content']);
 						}else $section = $app['manager.section']->saveSection($section->id, $datas['name'], $datas['content'], $isNew);
+						//aff message
 						$app['session']->getFlashBag()->add('info', 'Section '.$section->name.' '.($isNew ? 'created' : 'updated'));
 						if(!isset($datas['name'])) return $this->section($app, $section->name, false, true);
 						if($isNew) return $app->redirect($app['url_generator']->generate('manage.sections.edit', array('id' => $section->id)));
@@ -96,6 +124,7 @@ namespace DemoBackOffice\Controller{
 			}
 			if($fromUser) $urlBack = $app['url_generator']->generate('manage.other', array('page' => $section->name));	
 			else $urlBack = $app['url_generator']->generate('manage.sections', array('id' => $section->id));
+
 			return $app['twig']->render('manage/section-edit.html.twig', 
 				array(
 					'fromUser' => $fromUser,
@@ -112,6 +141,9 @@ namespace DemoBackOffice\Controller{
 			); 
 		}
 
+		/**
+		 * handle section list aff
+		 */
 		public function index(Application $app, $ajax = false){
 			$access = $this->checkAccess($app, $this->sectionName);
 			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);

@@ -20,6 +20,9 @@ namespace DemoBackOffice\Model\Entity{
 			return ($this->type >= self::$EDIT);
 		}
 
+		/**
+		 * give the maximum right
+		 */
 		public function setAdminMode(){
 			$this->type = self::$EDIT;
 		}

@@ -8,6 +8,9 @@ namespace DemoBackOffice\Model{
 	use DemoBackOffice\Model\Entity\AccessType;
 	use Exception;
 
+	/**
+	 * load usertype
+	 */
 	class UserTypeManager{
 
 		protected $db;
@@ -16,6 +19,10 @@ namespace DemoBackOffice\Model{
 			$this->db = $connection;
 		}
 
+		/**
+		 * delete user type
+		 * @param UserType
+		 */
 		public function deleteUserType(UserType $userType){
 			if(!$userType->isSuperAdmin()){
 				$stmt = $this->db->executeQuery("select id_user from user where id_type_user=?", array( $userType->id));
@@ -24,6 +31,12 @@ namespace DemoBackOffice\Model{
 			}else throw new Exception('You can\'t delete this right');
 		}
 
+
+		/**
+		 * get user type access
+		 * @param UserType
+		 * @return array(AccessType)
+		 */
 		private function getUserTypeAccess(UserType $userType){
 			$stmt =$this->db->executeQuery("SELECT id_type_access, id_section from access where id_type_user=?", array($userType->id));
 			if (!$accessType = $stmt->fetchall())  return array();
@@ -32,6 +45,8 @@ namespace DemoBackOffice\Model{
 
 		/**
 		 * load all userType access
+		 * @param	UserType
+		 * @return Usertype with AccessType load
 		 */
 		protected function loadUserTypeAccess(UserType $userType){
 			$userType->purgeAccess();
@@ -45,6 +60,10 @@ namespace DemoBackOffice\Model{
 		}
 
 		/**
+		 * search by name or id
+		 * @param	string by
+		 * @param 	string value
+		 * @return	UserType
 		 * @throw exception if type_user asked not found
 		 */
 		private function searchUserType($by, $value){
@@ -58,17 +77,34 @@ namespace DemoBackOffice\Model{
 			return $this->loadUserTypeAccess($user);
 		}
 
+		/**
+		 * get user type by id
+		 * @param	string	id
+		 * @return UserType
+		 */
 		public function getUserTypeById($id){
 			return $this->searchUserType('id', $id);
 		}
 
+		/**
+		 * get user type by name
+		 * @param	string	name
+		 * @return UserType
+		 */
 		public function getUserTypeByName($name){
 			return $this->searchUserType('name', $name);
 		}
 
+		/**
+		 * Save user Type Accesstype
+		 * @param UserType
+		 * @param array(<AccessType>)
+		 * @return UserType with his new access
+		 */
 		protected function saveUserTypeAccess(UserType $userType, $access){
 			if(count($access) > 0){
 				$rows = $this->getUserTypeAccess($userType);
+				//get old access
 				for($i = 0, $oldUserType = array(); $i < count($rows); $i++) {
 					$oldUserType[$rows[$i]['id_section']] = $rows[$i]['id_type_access'];
 				}
@@ -76,6 +112,7 @@ namespace DemoBackOffice\Model{
 				foreach($access as $sectionId => $accessType){
 					//minimum right is to read
 					if($accessType->canRead()){
+						//update access
 						$params = array($accessType->type, date('Y-m-d H:i:s'), $sectionId, $userType->id);
 						if(!isset($oldUserType[$sectionId])){
 							$sql = "insert into access(date_creation_access, id_type_access, date_modification_access, id_section, id_type_user ) values (?,?,?,?,?)";
@@ -86,18 +123,29 @@ namespace DemoBackOffice\Model{
 						$this->db->executeQuery($sql, $params);
 					}	
 				}
+				//delete old and unused access
 				$this->db->executeQuery( "delete from access where date_modification_access < ?", array($dateMaj));
 			}
 			$userType = $this->loadUserTypeAccess($userType);
 			return $userType;
 		}
 
+		/**
+		 * Save userType
+		 * @param	string	id
+		 * @param	string	name
+		 * @param	string	description
+		 * @param	string	access
+		 * @param	bool	new
+		 * @return	UserType
+		 */
 		public function saveUserType($id, $name, $description, $access, $new = false){
 			$userType = $this->getUserTypeByName($name);
 			$userType->name = $name;
 			$userType->description = $description;
 			$userType->update = date('Y-m-d H:i:s');
 			if($userType->id != '' || $id != ''){
+				//if name already taken by another right
 				if($new || ($userType-> id != '' && $userType->id != $id)) throw new Exception('Name:"'.$name.'" already used for another right');
 				$userType->id = $id;
 				if($userType->isSuperAdmin()) throw new Exception('This is admin right it cannot be updated');
@@ -121,6 +169,7 @@ SQL;
 
 		/**
 		 *	return a type_user list
+		 *	@return array(<UserType>)
 		 */
 		public function loadUserTypes(){
 			$stmt = $this->db->executequery('select id_type_user, type_user, date_modification_type_user, description_type_user from type_user order by type_user asc');

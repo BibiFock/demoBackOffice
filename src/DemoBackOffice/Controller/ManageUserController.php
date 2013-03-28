@@ -10,9 +10,14 @@ namespace DemoBackOffice\Controller{
 	use DemoBackOffice\Model\Entity\User;
 	use Exception;
 
+	/**
+	 * user management controller
+	 */
 	class ManageUserController extends ManageController{
+		//user section name
 		private $sectionName = 'users';
 
+		//define routing
 		public function connect(Application $app){
 			// créer un nouveau controller basé sur la route par défaut
 			$index = $app['controllers_factory'];
@@ -24,10 +29,16 @@ namespace DemoBackOffice\Controller{
 			return $index;
 		}
 
+		/**
+		 * user save form action
+		 */
 		public function userSave(Application $app, Request $request, $id){
 			return $this->userEdit($app, $request, $id, true);
 		}
 
+		/**
+		 * user delete action
+		 */
 		public function userDel(Application $app, Request $request, $id){
 			$access = $this->checkAccess($app, $this->sectionName);
 			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
@@ -43,20 +54,29 @@ namespace DemoBackOffice\Controller{
 			return $this->user($app, true);
 		}
 
+		/**
+		 * edition user
+		 */
 		public function userEdit(Application $app, Request $request, $id, $ajax = false){
+			//check access
 			$access = $this->checkAccess($app, $this->sectionName);
 			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
+			//define default var
 			$error = false;
 			$isErrorForm = false;
 			$isNew = ($id == "");
+			//get informations
 			$user = $app['manager.user']->getUserById($id);
 			$rights = $app['manager.rights']->loadUserTypes();
+			//convert information for show
 			for ($i = 0, $tmp = array(); $i < count($rights); $i++) {
 				$tmp[$rights[$i]->id] = $rights[$i]->name;
 			}
 			$rights = $tmp;
+			//check if user can edit
 			$readonly = !$access->canEdit();
 			$disabled = $user->isSuperAdmin() || $readonly;
+			//create the form
 			$form = $app['form.factory']->createBuilder('form')
 				->add('username', 'text', array(
 					'data' => $user->username,
@@ -81,14 +101,16 @@ namespace DemoBackOffice\Controller{
 					'disabled' => $disabled
 				))
 				->getForm();
+			//generate url save
 			$jsonSaveUser = array('url' => $app['url_generator']->generate('manage.users.save', array('id' => $user->id)));
+			//handle form response
 			if($request->isMethod('POST') && !$error){
 				$form->bind($request);
 				try{
 					$datas = $form->getData();
 					if($form->isValid()){
 						$datas = $form->getData();
-						if($user->isSuperAdmin()){
+						if($user->isSuperAdmin()){ // super admin can only change is password
 							$user = $app['manager.user']->changePassword($user->id, $datas['password']);
 						}else{
 							$user = $app['manager.user']->saveUser($user->id, $datas['username'], $datas['password'], $datas['right'], $isNew);
@@ -115,6 +137,9 @@ namespace DemoBackOffice\Controller{
 			); 
 		}
 
+		/**
+		 * user list
+		 */
 		public function user(Application $app, $ajax = false){
 			$access = $this->checkAccess($app, $this->sectionName);
 			$userManager = $app['manager.user'];
