@@ -61,9 +61,6 @@ CREATE TABLE IF NOT EXISTS `section` (
 CREATE TABLE IF NOT EXISTS `type_access` (
   `id_type_access` int(11) NOT NULL AUTO_INCREMENT,
   `type_access` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `description_access` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `date_creation_access` datetime NOT NULL,
-  `date_modification_access` datetime NOT NULL,
   PRIMARY KEY (`id_type_access`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -102,15 +99,31 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 -- TODO fill table type_access
 --
+INSERT INTO type_access( `id_type_access`, `type_access`) VALUES('1', 'FORBIDDEN');
+INSERT INTO type_access( `id_type_access`, `type_access`) VALUES('2', 'READONLY');
+INSERT INTO type_access( `id_type_access`, `type_access`) VALUES('3', 'EDITION');
+
+
  INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 1, 'sections', NOW(), NOW(), '', 2);
  INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 2, 'users', NOW(), NOW(), '', 2);
  INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 3, 'rights', NOW(), NOW(), '', 2);
+ INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 4, 'section_user_can_read', NOW(), NOW(), 'Ask to your administrator if you want to change this text ;)', 1);
+ INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 5, 'section_user_can_edit', NOW(), NOW(), 'You can change this content if you want', 1);
 
 INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
 (1, 'ROLE_ADMIN', 'Super user', NOW(), NOW());
+INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
+(2, 'ROLE_USER', 'simple user', NOW(), NOW());
 
 INSERT INTO `user` (`id_user`, `login_user`, `password_user`, `id_type_user`, `date_creation_user`, `date_modification_user`) VALUES
-(1, 'admin', 'admin', 1, '2013-03-20 00:00:00', '2013-03-20 00:00:00');
+(1, 'admin', 'admin', 1, NOW(), NOW());
+INSERT INTO `user` (`id_user`, `login_user`, `password_user`, `id_type_user`, `date_creation_user`, `date_modification_user`) VALUES
+(2, 'user', 'user', 2, NOW(), NOW());
+
+INSERT INTO access ( `id_section`, `id_type_user`, `id_type_access`, `date_creation_access`, `date_modification_access`)
+VALUES (4, 2, 2, NOW(), NOW());
+INSERT INTO access ( `id_section`, `id_type_user`, `id_type_access`, `date_creation_access`, `date_modification_access`)
+VALUES (5, 2, 3, NOW(), NOW());
 
 --
 -- Contraintes pour les tables exportées

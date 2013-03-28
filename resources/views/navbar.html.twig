@@ -2,9 +2,11 @@
 		<div class="navbar-inner">
 			<div class="container-fluid">
 				<a class="brand" href="{{ url('index.index') }}">Project name</a>
+				{% if( is_granted('IS_AUTHENTICATED_FULLY')) %}
 				<p class="navbar-text pull-left">
 					Hello <strong>{{ app.security.token.username }}</strong>, you are connected as a <strong>{{ app.security.token.getUser().type.name }}</strong>
 				</p>
+				{% endif %}
 				<p class="navbar-text pull-right">
 				{% if( is_granted('IS_AUTHENTICATED_FULLY')) %}
 					<a href="{{ path('manage_logout') }}">Logout <span class="icon-off"></span></a>
