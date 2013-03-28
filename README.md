@@ -27,6 +27,12 @@
 			+ you can choose what kind of access (forbidden/readonly/edition) the user will have to the section
 	+ You have a super user avaiblable: admin/admin 
 		+ him and his right can't be deleted
++ Sample test
+	+ Login: user/user
+	+ this user can access to 2 sections
+		+ one for read
+		+ one for edit
+	
 
 #### Based sources
 + http://silex.sensiolabs.org
