@@ -1,0 +1,17 @@
+{% extends 'layout.html.twig' %}
+{% set active = page %}
+
+{% block content %}
+	{% if(forbidden == false) %}
+		<h3>Welcome in section: '{{ page }}' of demoBackOffice </h3>
+		<h6>You can see below the content of this page</h6>
+		<hr />
+		<p>{{ content }}</p>
+		<hr />
+		{% if(jsonUrlEdit != '') %}
+			<p>You can edit the content of this section here <a href="#" data-role="loadUrl" data-options="{{ jsonUrlEdit }}">Here</a></p>
+		{% endif %}
+	{% else %}
+		<h3>section not found...</h3>
+	{% endif %}
+{% endblock %}
