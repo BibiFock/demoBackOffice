@@ -1,1 +1,1 @@
-{"driver":"pdo_mysql","host":"127.0.0.1","dbname":"demoBackOffice","user":"root","password":null}
+{"driver":"pdo_mysql","host":"127.0.0.1","dbname":"demoBackOffice","user":"root","password":"mysql"}

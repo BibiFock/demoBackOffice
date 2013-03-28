@@ -99,8 +99,9 @@ CREATE TABLE IF NOT EXISTS `user` (
   KEY `login_user` (`login_user`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
---TODO fill table type_access
-
+--
+-- TODO fill table type_access
+--
  INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 1, 'sections', NOW(), NOW(), '', 2);
  INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 2, 'users', NOW(), NOW(), '', 2);
  INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 3, 'rights', NOW(), NOW(), '', 2);

@@ -1,4 +1,4 @@
-{% extends 'layout.html.twig' %}
+{% extends (ajax ? 'ajax.html.twig' : 'layout.html.twig' ) %}
 {% set active = page %}
 
 {% block content %}

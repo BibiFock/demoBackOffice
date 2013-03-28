@@ -23,8 +23,11 @@
 						{{ form_rest(form) }}
 						<br />
 						{% if readonly == false %}
+							{% if fromUser %}
+								<input type="hidden" name="from" value="user"/>
+							{% endif %}
 						<button class="btn btn-button" >SAVE</button>
 						{% endif %}
 					</form>
-					<a href=" {{ urlBack }}" class="btn btn-button text-right">SEE LIST</a>
+					<a href=" {{ urlBack }}" class="btn btn-button text-right">BACK</a>
 {% endblock %}

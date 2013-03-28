@@ -28,7 +28,7 @@ namespace DemoBackOffice\Controller{
 			return $app['twig']->render('manage/index.html.twig'); 
 		}
 
-		public function section(Application $app, $page, $forbidden = false){
+		public function section(Application $app, $page, $forbidden = false, $ajax = false){
 			$section = $app['manager.section']->getSectionByName($page);
 			$jsonUrlEdit = "";
 			if(!$forbidden){
@@ -41,6 +41,7 @@ namespace DemoBackOffice\Controller{
 				}
 			}
 			return $app['twig']->render('manage/section.html.twig', array(
+				'ajax' => $ajax,
 				'forbidden' => $forbidden,
 				'pageId' => $section->id,
 				'jsonUrlEdit' => $jsonUrlEdit,

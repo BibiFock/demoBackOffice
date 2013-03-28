@@ -44,8 +44,9 @@ namespace DemoBackOffice\Model{
 		public function saveSectionContent($id, $content){
 			$section = $this->getSectionById($id);
 			if($section->id != ''){
-				$this->db->executeQuery('update section set section_content=? where id_section=?', array($content, $id));
+				$this->db->executeQuery('update section set content_section=? where id_section=?', array($content, $id));
 			}
+			return $section;
 		}
 
 		public function saveSection($id, $name, $content, $new = false){

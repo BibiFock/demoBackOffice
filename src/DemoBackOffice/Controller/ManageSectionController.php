@@ -50,7 +50,7 @@ namespace DemoBackOffice\Controller{
 			if(!$ajax) $ajax = $fromUser;
 			$isNew = ($id == "");
 			$section = $app['manager.section']->getSectionByid($id);
-			$sectionName = (!$isNew ? $section->name : $this->sectionName);
+			$sectionName = ($fromUser ? $section->name : $this->sectionName);
 			$access = $this->checkAccess($app, $sectionName);
 			if(!$access->canRead()) return $this->section($app, $sectionName, true);
 			$readonly = !$access->canEdit();
@@ -67,7 +67,6 @@ namespace DemoBackOffice\Controller{
 					)
 				);
 			if($fromUser) unset($nameOptions['constraints']);
-			//TODO finish this part
 			$form = $app['form.factory']->createBuilder('form')
 				->add('name', 'text', $nameOptions)
 				->add('content', 'textarea',array(
@@ -77,8 +76,6 @@ namespace DemoBackOffice\Controller{
 				))
 				->getForm();
 
-			if($fromUser) $form->add('from', 'hidden', array('data' => 'user'));
-
 			$jsonSaveSection = array('url' => $app['url_generator']->generate('manage.sections.save', array('id' => $section->id)));
 			if($request->isMethod('POST') && !$error){
 				$form->bind($request);
@@ -86,10 +83,12 @@ namespace DemoBackOffice\Controller{
 					$datas = $form->getData();
 					if($form->isValid()){
 						$datas = $form->getData();
-						if(!isset($datas['name'])) $section = $app['manager.section']->saveSectionContent($section->id, $datas['content']);
-						else $section = $app['manager.section']->saveSection($section->id, $datas['name'], $datas['content'], $isNew);
+						if(!isset($datas['name'])){ 
+							$section = $app['manager.section']->saveSectionContent($section->id, $datas['content']);
+						}else $section = $app['manager.section']->saveSection($section->id, $datas['name'], $datas['content'], $isNew);
 						$app['session']->getFlashBag()->add('info', 'Section '.$section->name.' '.($isNew ? 'created' : 'updated'));
-						if($isNew) return $this->section($app, $section->name, false, true);
+						if(!isset($datas['name'])) return $this->section($app, $section->name, false, true);
+						if($isNew) return $app->redirect($app['url_generator']->generate('manage.sections.edit', array('id' => $section->id)));
 					}else $isErrorForm = true;
 				}catch(Exception $e){
 					$app['session']->getFlashBag()->add('warning', $e->getMessage());
@@ -99,6 +98,7 @@ namespace DemoBackOffice\Controller{
 			else $urlBack = $app['url_generator']->generate('manage.sections', array('id' => $section->id));
 			return $app['twig']->render('manage/section-edit.html.twig', 
 				array(
+					'fromUser' => $fromUser,
 					'readonly' => $readonly,
 					'form' => $form->createView(),
 					'ajax' => $ajax,
