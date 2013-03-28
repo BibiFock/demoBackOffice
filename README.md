@@ -1,6 +1,6 @@
 #DemoBackOffice
 
-## Installation :
+### Installation :
 
 + php /path/to/composer/composer.phar install
 
@@ -28,7 +28,9 @@
 	+ You have a super user avaiblable: admin/admin 
 		+ him and his right can't be deleted
 
-### Silex based frameworks
+#### Based sources
 + http://silex.sensiolabs.org
++ http://twitter.github.com/bootstrap/
++ http://jquery.com/
 
 
