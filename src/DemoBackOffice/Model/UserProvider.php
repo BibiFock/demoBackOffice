@@ -50,17 +50,17 @@ namespace DemoBackOffice\Model{
 			}else throw new Exception('unfound user');
 		}
 
-		public function saveUser($login, $password, $userType, $new = false){
+		public function saveUser($id, $login, $password, $userType, $new = false){
 			$user = $this->getUserByName($login);
 			$user->update = date('Y-m-d H:i:s');
 			$params = array($login, $password, $user->update, $userType );
-			//TODO review algo update user like for usertype
-			if($user->id != ''){
-				if($new) throw new Exception('Username already used');
+			if($user->id != "" || $id != ""){
+				if($new || ($user->id != "" && $user->id != $id )) throw new Exception('Username already used');
+				if($user->isSuperAdmin()) throw new Exception('This is super admin user, it cannot be updated');
 				$sql = "update user set login_user=?, password_user=?, date_modification_user=?, id_type_user=? where id_user=?";
-				$params[] = $user->id;
+				$params[] = $id;
 			}else{
-				array_unshift( $params, $this->update);
+				array_unshift( $params, $user->update);
 				$sql = "insert into user(date_creation_user, login_user, password_user, date_modification_user, id_type_user) VALUES(?,?,?,?,?)";
 			}
 			$this->app['db']->executeQuery($sql, $params);
@@ -87,19 +87,21 @@ namespace DemoBackOffice\Model{
 		protected function loadUserTypeAccess(UserType $userType){
 			$userType->purgeAccess();
 			if($userType->id > 0){
-				$accessType = $this->getUserTypeAccess($userType);
+				$accessType = $this->app['manager.rights']->getUserTypeAccess($userType);
 				for ($i = 0; $i < count($accessType); $i++) {
 					$userType->addAccess($accessType[$i]['id_section'], new AccessType($accessType[$i]['id_type_access']));
 				}
 			}
 			return $userType;
 		}
+
 		/** UserProviderInterface * */
 		public function loadUserByUsername($username){
 			$user =  $this->searchUser('name', $username);
 			if ($user->id == null) {
 				throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
 			}
+			$user->loadSections($this->app['manager.section']->loadSections());
 			return $user;
 		}
 	

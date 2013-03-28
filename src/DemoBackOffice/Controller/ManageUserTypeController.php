@@ -11,7 +11,8 @@ namespace DemoBackOffice\Controller{
 	use DemoBackOffice\Model\Entity\AccessType;
 	use Exception;
 
-	class ManageUserTypeController implements ControllerProviderInterface{
+	class ManageUserTypeController extends ManageController{
+		private $sectionName = 'rights';
 		public function connect(Application $app){
 			// créer un nouveau controller basé sur la route par défaut
 			$index = $app['controllers_factory'];
@@ -24,32 +25,45 @@ namespace DemoBackOffice\Controller{
 		}
 
 		public function userType(Application $app, $ajax = false){
+			$access = $this->checkAccess($app, $this->sectionName);
+			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
+
 			$typeUserManager = $app['manager.rights'];
 			$typeUsers = $typeUserManager->loadUserTypes();
 			return $app['twig']->render('manage/rights-list.html.twig', array(
 				'rights' => $typeUsers,
 				'jsonNewRights' => json_encode(array('url'=> $app['url_generator']->generate('manage.rights.edit'))),
 				'ajax' => $ajax,
+				'readonly' => !$access->canEdit(),
 			)); 
 		}
 
 		public function userTypeEdit(Application $app, Request $request, $id, $ajax = false){
+			$access = $this->checkAccess($app, $this->sectionName);
+			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
+
 			$error = false;
 			$isErrorForm = false;
 			$isNew = ($id == "");
 			$userType = $app['manager.rights']->getUserTypeById($id);
 			$sections = $app['manager.section']->loadSections();
+			$readonly = $userType->isSuperAdmin() || !$access->canEdit();
 			$form = $app['form.factory']->createBuilder('form')
 				->add('name', 'text', array(
 					'data' => $userType->name,
-					'disabled' => $userType->isSuperAdmin(),
+					'disabled' => $readonly,
 					'constraints'  => array(
 						new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '50')),
+						new Assert\Regex(array(
+							'pattern' => '#^[a-z0-9_-]+$#i',
+							'match'   => true,
+							'message' => "Your right name can only contains this chars [0-9_-A-Za-z]",
+						))
 					)
 				))
 				->add('description', 'textarea',array(
 					'data' => $userType->description,
-					'disabled' => $userType->isSuperAdmin(),
+					'disabled' => $readonly,
 					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100')))
 				))
 				->getForm();
@@ -59,7 +73,7 @@ namespace DemoBackOffice\Controller{
 					array(
 						'choices' => array(AccessType::$FORBIDDEN => 'Forbidden', AccessType::$READONLY => 'Readonly', AccessType::$EDIT => 'Manage'),
 						'data' => $userType->getAccessToSection($sections[$i]->id)->type,
-						'disabled' => $userType->isSuperAdmin(),
+						'disabled' => $readonly,
 					)
 				);
 			}
@@ -87,6 +101,7 @@ namespace DemoBackOffice\Controller{
 			
 			return $app['twig']->render('manage/rights-edit.html.twig', 
 				array(
+					'readonly' => $readonly,
 					'form' => $form->createView(),
 					'ajax' => $ajax,
 					'error' => $error,
@@ -100,8 +115,11 @@ namespace DemoBackOffice\Controller{
 		}
 
 		public function userTypeDel(Application $app, Request $request, $id){
+			$access = $this->checkAccess($app, $this->sectionName);
+			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
 			if($id != "" && $request->isMethod('POST')){ 
 				try{
+					//check is there is no user with this type
 					$userType = $app['manager.rights']->getUserTypeById($id);
 					if($userType->id != '') $app['manager.rights']->deleteUserType($userType);
 					$app['session']->getFlashBag()->add('info', 'Section '.$userType->name.' deleted');

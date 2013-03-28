@@ -10,24 +10,27 @@ namespace DemoBackOffice\Controller{
 	use DemoBackOffice\Model\Entity\Section;
 	use Exception;
 
-	class ManageSectionController implements ControllerProviderInterface{
+	class ManageSectionController extends ManageController{
+		private $sectionName = 'sections';
 
 		public function connect(Application $app){
 			// créer un nouveau controller basé sur la route par défaut
 			$index = $app['controllers_factory'];
-			$index->match("/",'DemoBackOffice\Controller\ManageSectionController::section')->bind("manage.sections");
-			$index->match("/edit/{name}",'DemoBackOffice\Controller\ManageSectionController::sectionEdit')->value('name', '')->bind("manage.sections.edit");
-			$index->match("/save/{name}",'DemoBackOffice\Controller\ManageSectionController::sectionSave')->value('name', '')->bind("manage.sections.save");
+			$index->match("/",'DemoBackOffice\Controller\ManageSectionController::index')->bind("manage.sections");
+			$index->match("/edit/{id}",'DemoBackOffice\Controller\ManageSectionController::sectionEdit')->assert('id', '[0-9]+')->value('id', '')->bind("manage.sections.edit");
+			$index->match("/save/{id}",'DemoBackOffice\Controller\ManageSectionController::sectionSave')->assert('id', '[0-9]+')->value('id', '')->bind("manage.sections.save");
 			$index->match("/del/{id}",'DemoBackOffice\Controller\ManageSectionController::sectionDel')->assert('id', '[0-9]+')->bind("manage.sections.delete");
 
 			return $index;
 		}
 
-		public function sectionSave(Application $app, Request $request, $name){
-			return $this->sectionEdit($app, $request, $name, true);
+		public function sectionSave(Application $app, Request $request, $id){
+			return $this->sectionEdit($app, $request, $id, true);
 		}
 
 		public function sectionDel(Application $app, Request $request, $id){
+			$access = $this->checkAccess($app, $this->sectionName);
+			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
 			if($id != "" && $request->isMethod('POST')){ 
 				try{
 					$section = $app['manager.section']->getSectionById($id);
@@ -37,49 +40,66 @@ namespace DemoBackOffice\Controller{
 					$app['session']->getFlashBag()->add('error', 'delete error:'.$e->getMessage());
 				}
 			}
-			return $this->section($app, true);
+			return $this->index($app, true);
 		}
 
-		public function sectionEdit(Application $app, Request $request, $name, $ajax = false){
+		public function sectionEdit(Application $app, Request $request, $id, $ajax = false){
 			$error = false;
 			$isErrorForm = false;
-			$isNew = ($name == "");
-			$section = $app['manager.section']->getSectionByName($name);
-			$form = $app['form.factory']->createBuilder('form')
-				->add('name', 'text', array(
+			$fromUser = $request->get('from') == 'user';
+			if(!$ajax) $ajax = $fromUser;
+			$isNew = ($id == "");
+			$section = $app['manager.section']->getSectionByid($id);
+			$sectionName = (!$isNew ? $section->name : $this->sectionName);
+			$access = $this->checkAccess($app, $sectionName);
+			if(!$access->canRead()) return $this->section($app, $sectionName, true);
+			$readonly = !$access->canEdit();
+			$nameOptions = array(
 					'data' => $section->name,
+					'disabled' => ($readonly || $fromUser),
 					'constraints'  => array(
 						new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '50')),
 						new Assert\Regex(array(
-							'pattern' => '#^[^\/]+$#',
+							'pattern' => '#^[a-z0-9_-]+$#i',
 							'match'   => true,
 							'message' => "Your section name can only contains this chars [0-9_-A-Za-z]",
 						))
 					)
-				))
+				);
+			if($fromUser) unset($nameOptions['constraints']);
+			//TODO finish this part
+			$form = $app['form.factory']->createBuilder('form')
+				->add('name', 'text', $nameOptions)
 				->add('content', 'textarea',array(
 					'data' => $section->content,
+					'disabled' => $readonly,
 					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100')))
 				))
 				->getForm();
-			$jsonSaveSection = array('url' => $app['url_generator']->generate('manage.sections.save', array('name' => $section->name)));
+
+			if($fromUser) $form->add('from', 'hidden', array('data' => 'user'));
+
+			$jsonSaveSection = array('url' => $app['url_generator']->generate('manage.sections.save', array('id' => $section->id)));
 			if($request->isMethod('POST') && !$error){
 				$form->bind($request);
 				try{
 					$datas = $form->getData();
 					if($form->isValid()){
 						$datas = $form->getData();
-						$section = $app['manager.section']->saveSection($datas['name'], $datas['content'], $isNew);
+						if(!isset($datas['name'])) $section = $app['manager.section']->saveSectionContent($section->id, $datas['content']);
+						else $section = $app['manager.section']->saveSection($section->id, $datas['name'], $datas['content'], $isNew);
 						$app['session']->getFlashBag()->add('info', 'Section '.$section->name.' '.($isNew ? 'created' : 'updated'));
-						if($isNew) return $app->redirect($app['url_generator']->generate('manage.sections.edit', array('name' => $section->name)));
+						if($isNew) return $this->section($app, $section->name, false, true);
 					}else $isErrorForm = true;
 				}catch(Exception $e){
 					$app['session']->getFlashBag()->add('warning', $e->getMessage());
 				}
 			}
-			
+			if($fromUser) $urlBack = $app['url_generator']->generate('manage.other', array('page' => $section->name));	
+			else $urlBack = $app['url_generator']->generate('manage.sections', array('id' => $section->id));
 			return $app['twig']->render('manage/section-edit.html.twig', 
 				array(
+					'readonly' => $readonly,
 					'form' => $form->createView(),
 					'ajax' => $ajax,
 					'error' => $error,
@@ -87,17 +107,27 @@ namespace DemoBackOffice\Controller{
 					'section' => $section,
 					'jsonSaveSection' => json_encode($jsonSaveSection),
 					'isNew' => $isNew,
+					'urlBack' =>$urlBack ,
 				) 
 			); 
 		}
 
-		public function section(Application $app, $ajax = false){
+		public function index(Application $app, $ajax = false){
+			$access = $this->checkAccess($app, $this->sectionName);
+			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
 			$sectionManager = $app['manager.section'];
-			$sections = $sectionManager->loadSections();
+			$sections = $sectionManager->loadSections(false, true);
+			for ($i = 0, $tmp = array(); $i < count($sections); $i++) {
+				if($this->checkAccess($app, $sections[$i]->name)->canRead()){
+					$tmp[] = $sections[$i];
+				}
+			}
+			$sections = $tmp;
 			return $app['twig']->render('manage/section-list.html.twig', array(
 				'sections' => $sections,
 				'jsonNewSection' => json_encode(array('url'=> $app['url_generator']->generate('manage.sections.edit'))),
 				'ajax' => $ajax,
+				'readonly' => !$access->canEdit(),
 			)); 
 		}
 

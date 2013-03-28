@@ -18,8 +18,9 @@ namespace DemoBackOffice\Model{
 
 		public function deleteUserType(UserType $userType){
 			if(!$userType->isSuperAdmin()){
-				//TODO check if user have right yet
-				$stmt = $this->db->executeQuery("delete from type_user where id_type_user=?", array( $userType->id));
+				$stmt = $this->db->executeQuery("select id_user from user where id_type_user=?", array( $userType->id));
+				if($stmt->fetchall()) throw new Exception("This right cannot be delete because is used by some users...");
+				$this->db->executeQuery("delete from type_user where id_type_user=?", array( $userType->id));
 			}else throw new Exception('You can\'t delete this right');
 		}
 
@@ -34,7 +35,7 @@ namespace DemoBackOffice\Model{
 		 */
 		protected function loadUserTypeAccess(UserType $userType){
 			$userType->purgeAccess();
-			if($userType->id > 0){
+			if($userType->id != 0){
 				$accessType = $this->getUserTypeAccess($userType);
 				for ($i = 0; $i < count($accessType); $i++) {
 					$userType->addAccess($accessType[$i]['id_section'], new AccessType($accessType[$i]['id_type_access']));
@@ -114,7 +115,7 @@ SQL;
 				$params = array( $name, $description);
 			}
 			$this->db->executequery($sql, $params);
-			if($userType == null) $userType = $this->getUserTypeByName($name);
+			if($userType->id == '') $userType = $this->getUserTypeByName($name);
 			return $this->saveUserTypeAccess( $userType, $access); 
 		}
 

@@ -8,11 +8,6 @@ namespace DemoBackOffice\Model\Entity{
 		public static $EDIT = 3;
 		public $type;
 
-		public static function getStaticValues($var){
-			if(isset(self::$$var)) return self::$$var;
-			return null;
-		}
-
 		public function __construct($type){
 			$this->type = $type;
 		}

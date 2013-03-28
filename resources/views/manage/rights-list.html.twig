@@ -9,7 +9,10 @@
 					{% else %}
 					<h5>no right found</h5>
 					{% endif %}
+
+					{% if readonly == false %}
 					<p> Create a <a href="{{ path('manage.rights.edit') }}">New Right</a></p>
+					{% endif %}
 					{% if rights|length > 0 %}
 					<table class="table table-striped table-hover table-condensed">
 						<thead>
@@ -23,7 +26,7 @@
 								<td>{{ right.description }}</td>
 								<td>
 									<a class="btn btn-small" href="{{ path('manage.rights.edit', {'id':right.id})}}" >EDIT</a>
-									{% if right.isSuperAdmin() == false %}
+									{% if right.isSuperAdmin() == false and readonly == false %}
 									<button class="btn btn-small" data-role="delSection" data-options="{&quot;url&quot;: &quot;{{ path('manage.rights.delete',  {'id': right.id }) }}&quot;}">DELETE</a>
 									{% endif %}
 								</td>

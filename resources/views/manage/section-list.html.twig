@@ -9,7 +9,9 @@
 					{% else %}
 					<h5>no section found</h5>
 					{% endif %}
+					{% if readonly == false %}
 					<p> Create a <a href="{{ path('manage.sections.edit') }}">New Section</a></p>
+					{% endif %}
 					{% if sections|length > 0 %}
 					<table class="table table-striped table-hover table-condensed">
 						<thead>
@@ -22,8 +24,10 @@
 								<td>{{ section.update }}</td>
 								<td>
 								{% if section.isAdminSection() == false %}
-									<a class="btn btn-small" href="{{ path('manage.sections.edit', {'name':section.name})}}" >EDIT</a>
-									<button class="btn btn-small" data-role="delSection" data-options="{&quot;url&quot;: &quot;{{ path('manage.sections.delete',  {'id': section.id }) }}&quot;}">DELETE</a>
+									<a class="btn btn-small" href="{{ path('manage.sections.edit', {'id':section.id})}}" >EDIT</a>
+									{% if readonly == false %}
+										<button class="btn btn-small" data-role="delSection" data-options="{&quot;url&quot;: &quot;{{ path('manage.sections.delete',  {'id': section.id }) }}&quot;}">DELETE</a>
+									{% endif %}
 								{% else %}
 								--
 								{% endif %}

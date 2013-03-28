@@ -9,7 +9,9 @@
 					{% else %}
 					<h5>no user found</h5>
 					{% endif %}
+					{% if readonly == false %}
 					<p> Create a <a href="{{ path('manage.users.edit') }}">New user</a></p>
+					{% endif %}
 					{% if users|length > 0 %}
 					<table class="table table-striped table-hover table-condensed">
 						<thead>
@@ -22,8 +24,8 @@
 								<td>{{ user.update }}</td>
 								<td>{{ user.type.name }}</td>
 								<td>
-									<a class="btn btn-small" href="{{ path('manage.users.edit', {'name':user.username})}}" >EDIT</a>
-									{% if user.isSuperAdmin() == false %}
+									<a class="btn btn-small" href="{{ path('manage.users.edit', {'id':user.id})}}" >EDIT</a>
+									{% if user.isSuperAdmin() == false and readonly == false %}
 									<button class="btn btn-small" data-role="delSection" data-options="{&quot;url&quot;: &quot;{{ path('manage.users.delete',  {'id': user.id }) }}&quot;}">DELETE</a>
 									{% endif %}
 								</td>

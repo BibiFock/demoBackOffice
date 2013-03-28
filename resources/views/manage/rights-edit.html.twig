@@ -38,7 +38,7 @@
 						{% else %}
 						<h5>no sections found please add <a href="{{ path('manage.sections') }}">sections</a></h5>
 						{% endif %}
-						{% if right.isSuperAdmin == false %}
+						{% if right.isSuperAdmin == false and readonly == false %}
 							<button class="btn btn-button"  >SAVE</button>
 						{% endif %}
 						{{ form_rest(form) }}

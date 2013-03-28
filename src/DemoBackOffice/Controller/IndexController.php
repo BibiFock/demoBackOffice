@@ -22,39 +22,22 @@ namespace DemoBackOffice\Controller{
 
 		public function login(Application $app, Request $request){
 
+			//echo "<pre>";
+			//print_r($app['manager.user']->loadUserByUsername('user'));
+			//echo "</pre>";
+			//exit;
+
 			$form = $app['form.factory']->createBuilder('form')
 				->add('username', 'text')
 				->add('password', 'password')
 				->getForm();
-			//$error = "";
-			//if('POST' == $request->getMethod()){
-				//$form->bind($request);
-				//try{
-					//if($form->isValid()){
-						//$datas = $form->getData();
-						//$user = $app['security.users']->loadUserByUsername($datas['username']);
-						//if($user->getPassword() == $datas['password']){
-							//$app['session']->set('isAuthenticated', true);
-							//$app['session']->set('user', $user);
-							//return $app->redirect($app['url_generator']->generate('index.index'));
-						//}else throw new Exception('bad password');
-					//}else throw new Exception('please fill the formulaire');
-				//}catch(Exception $e){
-					//$error = $e->getMessage();
-				//}
-			//}
+
 			return $app['twig']->render('login.html.twig', array(
 					'form'  => $form->createView(),
         			'error' => $app['security.last_error']($request),
 					//'error' => $error,
 				));
 		}
-
-
-		//public function logout(Application $app){
-			//$app['session']->set('isAuthenticated', false);
-			//return $app->redirect($app['url_generator']->generate('index.index'));
-		//}
 
 	}
 

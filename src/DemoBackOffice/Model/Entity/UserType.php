@@ -19,11 +19,11 @@ namespace DemoBackOffice\Model\Entity{
 		}
 
 		public function addAccess($sectionId, AccessType $accessType){
-			$sections[$sectionId] = $accessType;
+			$this->sections[$sectionId] = $accessType;
 		}
 
 		public function getAccessToSection($sectionId){
-			if( isset($sections[$sectionId])) $accesType = $sections[$sectionId];
+			if( isset($this->sections[$sectionId])) $accessType = $this->sections[$sectionId];
 			else $accessType = new AccessType(AccessType::$FORBIDDEN);
 			if($this->isSuperAdmin() ) $accessType->setAdminMode();
 			return $accessType;

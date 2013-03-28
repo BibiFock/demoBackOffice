@@ -17,8 +17,12 @@
 	{% include 'navbar.html.twig' %}
 	<div class="container-fluid">
 		<div class="row-fluid">
+			{% if(is_granted('IS_AUTHENTICATED_FULLY') ) %}
 			{% include 'sidebar.html.twig' %}
 			<div class="span9">
+			{% else  %}
+			<div class="span12">
+			{% endif %}
 				<div class="hero-unit">
 					{% include 'flashbag.html.twig' %}
 					{% block content %}

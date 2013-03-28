@@ -99,17 +99,17 @@ CREATE TABLE IF NOT EXISTS `user` (
   KEY `login_user` (`login_user`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
- INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 1, 'section', NOW(), NOW(), '', 2);
- INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 2, 'user', NOW(), NOW(), '', 2);
- INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 3, 'right', NOW(), NOW(), '', 2);
+--TODO fill table type_access
+
+ INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 1, 'sections', NOW(), NOW(), '', 2);
+ INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 2, 'users', NOW(), NOW(), '', 2);
+ INSERT INTO section( `id_section`, `name_section`, `date_creation_section`, `date_modification_section`, `content_section`, `id_status_section`)  VALUES ( 3, 'rights', NOW(), NOW(), '', 2);
 
 INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
 (1, 'ROLE_ADMIN', 'Super user', NOW(), NOW());
-INSERT INTO `type_user` (`id_type_user`, `type_user`, `description_type_user`, `date_creation_type_user`, `date_modification_type_user`) VALUES
-(2, 'ROLE_ANONIMOUS', 'unlogged account', '2013-03-20 00:00:00', '2013-03-20 00:00:00');
 
 INSERT INTO `user` (`id_user`, `login_user`, `password_user`, `id_type_user`, `date_creation_user`, `date_modification_user`) VALUES
-(1, 'admin', 'admin', 2, '2013-03-20 00:00:00', '2013-03-20 00:00:00');
+(1, 'admin', 'admin', 1, '2013-03-20 00:00:00', '2013-03-20 00:00:00');
 
 --
 -- Contraintes pour les tables exportées

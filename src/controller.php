@@ -3,9 +3,9 @@
 $app->mount("/", new DemoBackOffice\Controller\IndexController());
 $app->mount("/install", new DemoBackOffice\Controller\InstallController());
 $app->mount("/manage/", new DemoBackOffice\Controller\ManageController());
-$app->mount("/manage/section/", new DemoBackOffice\Controller\ManageSectionController());
-$app->mount("/manage/right/", new DemoBackOffice\Controller\ManageUserTypeController());
-$app->mount("/manage/user/", new DemoBackOffice\Controller\ManageUserController());
+$app->mount("/manage/sections/", new DemoBackOffice\Controller\ManageSectionController());
+$app->mount("/manage/rights/", new DemoBackOffice\Controller\ManageUserTypeController());
+$app->mount("/manage/users/", new DemoBackOffice\Controller\ManageUserController());
 
 $app->error(function (\Exception $e, $code) use ($app) { 
 	if($app['debug']) return;

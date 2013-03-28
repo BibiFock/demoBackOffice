@@ -19,15 +19,19 @@
 						{{ form_label(form.username, 'User name') }}
 						{{ form_widget(form.username) }}
 
+						{% if readonly == false %}
 						{{ form_label(form.password, 'User password') }}
 						{{ form_widget(form.password) }}
+						{% endif %}
 
-						{{ form_label(form.right, 'User password') }}
+						{{ form_label(form.right, 'User right') }}
 						{{ form_widget(form.right) }}
 
-						{{ form_rest(form) }}
+						{{ form_widget(form._token) }}
 						<br />
+						{% if readonly == false %}
 						<button class="btn btn-button" >SAVE</button>
+						{% endif %}
 					</form>
 					<a href=" {{ path('manage.users') }}" class="btn btn-button text-right">SEE LIST</a>
 {% endblock %}

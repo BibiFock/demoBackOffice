@@ -10,24 +10,27 @@ namespace DemoBackOffice\Controller{
 	use DemoBackOffice\Model\Entity\User;
 	use Exception;
 
-	class ManageUserController implements ControllerProviderInterface{
+	class ManageUserController extends ManageController{
+		private $sectionName = 'users';
 
 		public function connect(Application $app){
 			// créer un nouveau controller basé sur la route par défaut
 			$index = $app['controllers_factory'];
 			$index->match("/",'DemoBackOffice\Controller\ManageUserController::user')->bind("manage.users");
-			$index->match("/edit/{name}",'DemoBackOffice\Controller\ManageUserController::userEdit')->value('name', '')->bind("manage.users.edit");
-			$index->match("/save/{name}",'DemoBackOffice\Controller\ManageUserController::userSave')->value('name', '')->bind("manage.users.save");
+			$index->match("/edit/{id}",'DemoBackOffice\Controller\ManageUserController::userEdit')->assert('id', '[0-9]+')->value('id', '')->bind("manage.users.edit");
+			$index->match("/save/{id}",'DemoBackOffice\Controller\ManageUserController::userSave')->assert('id', '[0-9]+')->value('id', '')->bind("manage.users.save");
 			$index->match("/del/{id}",'DemoBackOffice\Controller\ManageUserController::userDel')->assert('id', '[0-9]+')->bind("manage.users.delete");
 
 			return $index;
 		}
 
-		public function userSave(Application $app, Request $request, $name){
-			return $this->userEdit($app, $request, $name, true);
+		public function userSave(Application $app, Request $request, $id){
+			return $this->userEdit($app, $request, $id, true);
 		}
 
 		public function userDel(Application $app, Request $request, $id){
+			$access = $this->checkAccess($app, $this->sectionName);
+			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
 			if($id != "" && $request->isMethod('POST')){ 
 				try{
 					$user = $app['manager.user']->getUserById($id);
@@ -40,17 +43,20 @@ namespace DemoBackOffice\Controller{
 			return $this->user($app, true);
 		}
 
-		public function userEdit(Application $app, Request $request, $name, $ajax = false){
+		public function userEdit(Application $app, Request $request, $id, $ajax = false){
+			$access = $this->checkAccess($app, $this->sectionName);
+			if(!$access->canRead()) return $this->section($app, $this->sectionName, true);
 			$error = false;
 			$isErrorForm = false;
-			$isNew = ($name == "");
-			$user = $app['manager.user']->getUserByName($name);
+			$isNew = ($id == "");
+			$user = $app['manager.user']->getUserById($id);
 			$rights = $app['manager.rights']->loadUserTypes();
 			for ($i = 0, $tmp = array(); $i < count($rights); $i++) {
 				$tmp[$rights[$i]->id] = $rights[$i]->name;
 			}
 			$rights = $tmp;
-			$disabled = $user->isSuperAdmin();
+			$readonly = !$access->canEdit();
+			$disabled = $user->isSuperAdmin() || $readonly;
 			$form = $app['form.factory']->createBuilder('form')
 				->add('username', 'text', array(
 					'data' => $user->username,
@@ -58,7 +64,7 @@ namespace DemoBackOffice\Controller{
 					'constraints'  => array(
 						new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '50')),
 						new Assert\Regex(array(
-							'pattern' => '#^[^\/]+$#',
+							'pattern' => '#^[a-z0-9_-]+$#i',
 							'match'   => true,
 							'message' => "Your user name can only contains this chars [0-9_-A-Za-z]",
 						))
@@ -66,7 +72,8 @@ namespace DemoBackOffice\Controller{
 				))
 				->add('password', 'text',array(
 					'data' => $user->password,
-					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100')))
+					'constraints'  => array(new Assert\NotBlank(), new Assert\Length(array('min' => 2,'max' => '100'))),
+					'disabled' => $readonly,
 				))
 				->add('right', 'choice', array(
 					'choices' => $rights,
@@ -74,7 +81,7 @@ namespace DemoBackOffice\Controller{
 					'disabled' => $disabled
 				))
 				->getForm();
-			$jsonSaveUser = array('url' => $app['url_generator']->generate('manage.users.save', array('name' => $user->username)));
+			$jsonSaveUser = array('url' => $app['url_generator']->generate('manage.users.save', array('id' => $user->id)));
 			if($request->isMethod('POST') && !$error){
 				$form->bind($request);
 				try{
@@ -84,10 +91,10 @@ namespace DemoBackOffice\Controller{
 						if($user->isSuperAdmin()){
 							$user = $app['manager.user']->changePassword($user->id, $datas['password']);
 						}else{
-							$user = $app['manager.user']->saveUser($datas['username'], $datas['password'], $datas['right'], $isNew);
+							$user = $app['manager.user']->saveUser($user->id, $datas['username'], $datas['password'], $datas['right'], $isNew);
 						}
 						$app['session']->getFlashBag()->add('info', 'User '.$user->username.' '.($isNew ? 'created' : 'updated'));
-						if($isNew) return $app->redirect($app['url_generator']->generate('manage.users.edit', array('name' => $user->username)));
+						if($isNew) return $app->redirect($app['url_generator']->generate('manage.users.edit', array('id' => $user->id)));
 					}else $isErrorForm = true;
 				}catch(Exception $e){
 					$app['session']->getFlashBag()->add('warning', $e->getMessage());
@@ -96,6 +103,7 @@ namespace DemoBackOffice\Controller{
 			
 			return $app['twig']->render('manage/user-edit.html.twig', 
 				array(
+					'readonly' => !$access->canEdit(),
 					'form' => $form->createView(),
 					'ajax' => $ajax,
 					'error' => $error,
@@ -108,9 +116,11 @@ namespace DemoBackOffice\Controller{
 		}
 
 		public function user(Application $app, $ajax = false){
+			$access = $this->checkAccess($app, $this->sectionName);
 			$userManager = $app['manager.user'];
 			$users = $userManager->loadUsers();
 			return $app['twig']->render('manage/user-list.html.twig', array(
+				'readonly' => !$access->canEdit(),
 				'users' => $users,
 				'jsonNewUser' => json_encode(array('url'=> $app['url_generator']->generate('manage.users.edit'))),
 				'ajax' => $ajax,

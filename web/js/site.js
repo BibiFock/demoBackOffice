@@ -84,6 +84,14 @@ var functions = {
 			return false;
 		});
 	},
+	'loadUrl': function(){
+		$( this.el ).click(function(){
+			var opts = fetchOptions( this ); 
+			var target = $('.hero-unit');
+			functions.sendAjax('GET', opts.url, '&from=user', target);
+			return false;
+		});
+	},
 	'saveForm': function(){
 		$( this.el ).submit(function(){
 			var opts = fetchOptions( this ); 
