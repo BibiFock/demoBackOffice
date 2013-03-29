@@ -6,20 +6,20 @@
 
 + Go to "your host"/demoBackOffice/web/install fill the form and install the database
 
-+ Then go to "your host"/demoBackOffice/web/ for try it
++ Then go to "your host"/demoBackOffice/web/ to try it
 
 + SuperUser is admin / admin by default
 
 #### Why ?
-+ I have to create a small demonstration on based on PHP / MySQL of rights management in a backoffice.
++ I have to create a small demonstration based on PHP / MySQL of rights management in a backoffice.
 	+ I choose Silex because I didn't know this framework. 
 	+ So I took advantage of this exercise to discover it.
-+ I also take advantage of this exercise for try bootstrap.
++ I also take advantage of this exercice to try bootstrap.
 
 #### Rules
-+ You have to be logged for see the list of sections
++ You have to be logged to see the list of sections
 + Admin Parts
-	+ You have 3 admins sections
+	+ You have 3 admins parts
 		+ Sections: create/edit/delete section and edit their content
 		+ User: create/edit/delete user and define their right
 		+ Right or type user: 
