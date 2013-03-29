@@ -2,7 +2,7 @@
 
 ### Installation :
 
-+ php /path/to/composer/composer.phar install
++ execute command: ./composer.phar install (in the main project directory)
 
 + Go to <your host>/demoBackOffice/web/install fill the form and install the database
 
