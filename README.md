@@ -4,9 +4,9 @@
 
 + execute command: ./composer.phar install (in the main project directory)
 
-+ Go to <your host>/demoBackOffice/web/install fill the form and install the database
++ Go to "your host"/demoBackOffice/web/install fill the form and install the database
 
-+ Then go to <your host>/demoBackOffice/web/ for try it
++ Then go to "your host"/demoBackOffice/web/ for try it
 
 + SuperUser is admin / admin by default
 
