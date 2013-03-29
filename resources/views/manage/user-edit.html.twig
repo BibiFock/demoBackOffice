@@ -17,21 +17,24 @@
 					    {% endif %}
 
 						{{ form_label(form.username, 'User name') }}
-						{{ form_widget(form.username) }}
+						{{ form_widget(form.username, {'attr': {'class' : 'input-xlarge'}}) }}
 
 						{% if readonly == false %}
 						{{ form_label(form.password, 'User password') }}
-						{{ form_widget(form.password) }}
+						{{ form_widget(form.password, {'attr': {'class' : 'input-xlarge'}}) }}
 						{% endif %}
 
 						{{ form_label(form.right, 'User right') }}
-						{{ form_widget(form.right) }}
+						{{ form_widget(form.right, {'attr': {'class' : 'input-xlarge'}}) }}
 
 						{{ form_widget(form._token) }}
 						<br />
-						{% if readonly == false %}
-						<button class="btn btn-button" >SAVE</button>
-						{% endif %}
+						<br />
+						<p>
+							<a href=" {{ path('manage.users') }}" class="btn btn-button text-right">BACK</a>
+							{% if readonly == false %}
+								<button class="btn btn-button" >SAVE</button>
+							{% endif %}
+						</p>
 					</form>
-					<a href=" {{ path('manage.users') }}" class="btn btn-button text-right">BACK</a>
 {% endblock %}

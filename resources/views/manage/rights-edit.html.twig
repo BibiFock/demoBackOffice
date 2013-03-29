@@ -16,10 +16,10 @@
 					    {% endif %}
 
 						{{ form_label(form.name, 'Right name') }}
-						{{ form_widget(form.name) }}
+						{{ form_widget(form.name, {'attr': {'class' : 'input-xlarge'}}) }}
 
 						{{ form_label(form.description, 'Right description') }}
-						{{ form_widget(form.description) }}
+						{{ form_widget(form.description, {'attr': {'class' : 'input-xlarge'}}) }}
 						<br />
 						{% if sections|length > 0 %}
 						<table class="table table-striped table-hover table-condensed">
@@ -30,7 +30,7 @@
 							{% for section in sections %}
 								<tr>
 									<td>{{ section.name }}</td>
-									<td> {{ form_widget(attribute(form, 'section_' ~ section.id)) }}	</td>
+									<td> {{ form_widget(attribute(form, 'section_' ~ section.id), {'attr': {'class' : 'input-medium'}}) }}	</td>
 								</tr>
 							{% endfor %}
 							</tbody>
@@ -38,10 +38,12 @@
 						{% else %}
 						<h5>no sections found please add <a href="{{ path('manage.sections') }}">sections</a></h5>
 						{% endif %}
-						{% if right.isSuperAdmin == false and readonly == false %}
+						<p>
+							<a href=" {{ path('manage.rights') }}" class="btn btn-button text-right">BACK</a>
+							{% if right.isSuperAdmin == false and readonly == false %}
 							<button class="btn btn-button"  >SAVE</button>
-						{% endif %}
+							{% endif %}
+						</p>
 						{{ form_rest(form) }}
 					</form>
-					<a href=" {{ path('manage.rights') }}" class="btn btn-button text-right">BACK</a>
 {% endblock %}

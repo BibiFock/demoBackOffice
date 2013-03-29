@@ -16,18 +16,21 @@
 					    {% endif %}
 
 						{{ form_label(form.name, 'Section name') }}
-						{{ form_widget(form.name) }}
+						{{ form_widget(form.name, {'attr': {'class' : 'input-xxlarge'}}) }}
 
 						{{ form_label(form.content, 'Section content') }}
-						{{ form_widget(form.content) }}
+						{{ form_widget(form.content, {'attr': {'class' : 'input-xxlarge'}}) }}
 						{{ form_rest(form) }}
 						<br />
-						{% if readonly == false %}
-							{% if fromUser %}
-								<input type="hidden" name="from" value="user"/>
+						<br />
+						<p >
+							<a href=" {{ urlBack }}" class="btn btn-button text-right">BACK</a>
+							{% if readonly == false %}
+								{% if fromUser %}
+									<input type="hidden" name="from" value="user"/>
+								{% endif %}
+								<button class="btn btn-button" >SAVE</button>
 							{% endif %}
-						<button class="btn btn-button" >SAVE</button>
-						{% endif %}
+						</p>
 					</form>
-					<a href=" {{ urlBack }}" class="btn btn-button text-right">BACK</a>
 {% endblock %}
