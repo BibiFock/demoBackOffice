@@ -1,25 +1,27 @@
 <?php
-namespace DemoBackOffice\Model\Entity{
 
-	class Section{
+namespace DemoBackOffice\Model\Entity;
 
-		public $id, $name, $update, $content, $status;
+class Section{
 
-		public function __construct($id, $name, $update, $content, $status){
-			$this->id = $id;
-			$this->name = $name; 
-			$this->update = $update;
-			$this->content = $content;
-			$this->status = $status;
-		}
+    public $id, $name, $update, $content, $status;
 
-		/**
-		 * if section is an admin section
-		 */
-		public function isAdminSection(){
-			return ($this->status == 2);
-		}
+    public function __construct($id, $name, $update, $content, $status)
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->update = $update;
+        $this->content = $content;
+        $this->status = $status;
+    }
 
-	}
+    /**
+     * if section is an admin section
+     */
+    public function isAdminSection()
+    {
+        return ($this->status == 2);
+    }
 
 }
+

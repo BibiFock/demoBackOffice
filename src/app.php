@@ -27,36 +27,36 @@ $app->register(new TwigServiceProvider(), array(
 $app->register(new DoctrineServiceProvider());
 
 $app['manager.user'] = $app->share(function () use ($app) {
-	return new DemoBackOffice\Model\UserProvider($app);
+    return new DemoBackOffice\Model\UserProvider($app);
 });
 
 $app->register(new SecurityServiceProvider(), array(
-	'security.firewalls' => array(
-		'manage' => array(
-			'pattern' => '^/manage/',
-			'form'    => array(
-				'login_path'         => '/login',
-				'check_path'         => '/manage/login_check',
-				'default_target_path' => '/manage/',
-				'always_use_default_target_path' => true,
-				'username_parameter' => 'form[username]',
-				'password_parameter' => 'form[password]',
-			),
-			'logout' => array(
-				'logout_path' => "/manage/logout",
-		        'target' => '/',
-			),
-			'anonymous' => false,
-			'users' => $app['manager.user'],
-		),
-		'web' => array(
-			'pattern' => '^/',
-			'anonymous' => true,
-		),
-	),
-	'security.access_rules' => array(
-		array('^/manage/', 'ROLE_ADMIN'),
-	),
+    'security.firewalls' => array(
+        'manage' => array(
+            'pattern' => '^/manage/',
+            'form'    => array(
+                'login_path'         => '/login',
+                'check_path'         => '/manage/login_check',
+                'default_target_path' => '/manage/',
+                'always_use_default_target_path' => true,
+                'username_parameter' => 'form[username]',
+                'password_parameter' => 'form[password]',
+            ),
+            'logout' => array(
+                'logout_path' => "/manage/logout",
+                'target' => '/',
+            ),
+            'anonymous' => false,
+            'users' => $app['manager.user'],
+        ),
+        'web' => array(
+            'pattern' => '^/',
+            'anonymous' => true,
+        ),
+    ),
+    'security.access_rules' => array(
+        array('^/manage/', 'ROLE_ADMIN'),
+    ),
 ));
 
 $app['security.encoder.digest'] = $app->share(function ($app) {
@@ -65,10 +65,10 @@ $app['security.encoder.digest'] = $app->share(function ($app) {
 
 
 $app['manager.section'] = $app->share(function () use ($app) {
-	return new DemoBackOffice\Model\SectionManager($app['db']);
+    return new DemoBackOffice\Model\SectionManager($app['db']);
 });
 
 $app['manager.rights'] = $app->share(function () use ($app) {
-	return new DemoBackOffice\Model\UserTypeManager($app['db']);
+    return new DemoBackOffice\Model\UserTypeManager($app['db']);
 });
 

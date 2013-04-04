@@ -1,153 +1,167 @@
-<?php    
-namespace DemoBackOffice\Model\Entity{
-	use Symfony\Component\Security\Core\User\UserInterface;
-	use DemoBackOffice\Model\Entity\UserType;
+<?php
+namespace DemoBackOffice\Model\Entity;
 
-	class User implements UserInterface{
+use Symfony\Component\Security\Core\User\UserInterface;
+use DemoBackOffice\Model\Entity\UserType;
 
-		public $id, $username, $password, $type, $update;
-		private $sections;
+class User implements UserInterface
+{
 
-		/**
-		 * constructor
-		 * @param	string	id
-		 * @param	string	username
-		 * @param	string	password
-		 * @param	object	type
-		 * @param	string	update
-		 * @param	array(object)	section
-		 */
-		public function __construct($id, $username, $password, $type, $update, $sections = array() ){
-			$this->id = $id;
-			$this->username = $username;
-			$this->password = $password;
-			$this->type = $type;
-			$this->update = $update;
-			$this->sections = $sections;
-		}
+    public $id, $username, $password, $type, $update;
+    private $sections;
 
-		/**
-		 * return a acces to a section by is name
-		 * @param sectionName
-		 * @return AccessType
-		 */
-		public function getAccessBySectionName($sectionName){
-			//if user is super admin always return access
-			if($this->isSuperAdmin()) return new AccessType(AccessType::$EDIT);
-			//for othe users
-			for ($i = 0; $i < count($this->sections); $i++) {
-				if($this->sections[$i]->name == $sectionName){
-					return $this->getSectionAccess($this->sections[$i]);
-				}
-			}
-			return new AccessType(AccessType::$FORBIDDEN);
-		}
-		
-		/**
-		 * get admin sections, that user can read
-		 * @param bool	isAdmin
-		 * @return	Section section
-		 */	
-		protected function getSections($isAdmin = true){
-			for ($i = 0, $return =  array(); $i < count($this->sections); $i++) {
-				 if($this->canRead($this->sections[$i]) && $this->sections[$i]->isAdminSection() == $isAdmin) $return[] = $this->sections[$i];
-			}
-			return $return;
-		}
+    /**
+     * constructor
+     * @param   string  id
+     * @param   string  username
+     * @param   string  password
+     * @param   object  type
+     * @param   string  update
+     * @param   array(object)   section
+     */
+    public function __construct($id, $username, $password, $type, $update, $sections = array() )
+    {
+        $this->id = $id;
+        $this->username = $username;
+        $this->password = $password;
+        $this->type = $type;
+        $this->update = $update;
+        $this->sections = $sections;
+    }
 
-		/**
-		 *
-		 * @param Section section
-		 * @return AccessType
-		 */
-		protected function getSectionAccess(Section $section){
-			return $this->type->getAccessToSection($section->id);
-		}
+    /**
+     * return a acces to a section by is name
+     * @param sectionName
+     * @return AccessType
+     */
+    public function getAccessBySectionName($sectionName)
+    {
+        //if user is super admin always return access
+        if ($this->isSuperAdmin()) {
+            return new AccessType(AccessType::$EDIT);
+        }
+        //for othe users
+        for ($i = 0; $i < count($this->sections); $i++) {
+            if ($this->sections[$i]->name == $sectionName) {
+                return $this->getSectionAccess($this->sections[$i]);
+            }
+        }
 
-		/**
-		 * check if user can read a section
-		 * @param section section
-		 * @return	bool
-		 */
-		public function canRead(Section $section){
-			return ($this->isSuperAdmin() || $this->getSectionAccess($section)->canRead());
-		}
+        return new AccessType(AccessType::$FORBIDDEN);
+    }
 
-		/**
-		 * @return array of section user, that user can read or edit
-		 */
-		public function getUserSections(){
-			return $this->getSections(false);
-		}
 
-		/**
-		 * @return array of section admin, that user can read or edit
-		 */
-		public function getAdminSections(){
-			return $this->getSections(true);
-		}
+    /**
+     * check if user can read a section
+     * @param section section
+     * @return  bool
+     */
+    public function canRead(Section $section)
+    {
+        return ($this->isSuperAdmin() || $this->getSectionAccess($section)->canRead());
+    }
 
-		/**
-		 * load some sections
-		 * @param array<Section>
-		 */
-		public function loadSections($sections){
-			if(is_array($sections)){
-				$this->sections = $sections;
-			}
-		}
+    /**
+     * @return array of section user, that user can read or edit
+     */
+    public function getUserSections()
+    {
+        return $this->getSections(false);
+    }
 
-		/**
-		 * @return bool
-		 */
-		public function isSuperAdmin(){
-			return $this->id == 1;
-		}
+    /**
+     * @return array of section admin, that user can read or edit
+     */
+    public function getAdminSections()
+    {
+        return $this->getSections(true);
+    }
 
-		/** User Interface implementation usefull for login **/
-		public function getRoles()
-		{
-			return array('ROLE_ADMIN');
-		}
+    /**
+     * load some sections
+     * @param array<Section>
+     */
+    public function loadSections($sections)
+    {
+        if (is_array($sections)) {
+            $this->sections = $sections;
+        }
+    }
 
-		public function getPassword()
-		{
-			return $this->password;
-		}
+    /**
+     * @return bool
+     */
+    public function isSuperAdmin()
+    {
+        return $this->id == 1;
+    }
 
-		public function getSalt()
-		{
-			return null;
-		}
+    /** User Interface implementation usefull for login **/
+    public function getRoles()
+    {
+        return array('ROLE_ADMIN');
+    }
 
-		public function getUsername()
-		{
-			return $this->username;
-		}
+    public function getPassword()
+    {
+        return $this->password;
+    }
 
-		public function eraseCredentials()
-		{
-		}
+    public function getSalt()
+    {
+        return null;
+    }
 
-		public function equals(UserInterface $user)
-		{
-			if (!$user instanceof User) {
-				return false;
-			}
+    public function getUsername()
+    {
+        return $this->username;
+    }
 
-			if ($this->password !== $user->getPassword()) {
-				return false;
-			}
+    public function eraseCredentials()
+    {
+    }
 
-			if ($this->getSalt() !== $user->getSalt()) {
-				return false;
-			}
+    public function equals(UserInterface $user)
+    {
+        if (!$user instanceof User) {
+            return false;
+        }
 
-			if ($this->username !== $user->getUsername()) {
-				return false;
-			}
+        if ($this->password !== $user->getPassword()) {
+            return false;
+        }
 
-			return true;
-		}
-	}
+        if ($this->getSalt() !== $user->getSalt()) {
+            return false;
+        }
+
+        if ($this->username !== $user->getUsername()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * get admin sections, that user can read
+     * @param bool  isAdmin
+     * @return  Section section
+     */
+    protected function getSections($isAdmin = true)
+    {
+        for ($i = 0, $return =  array(); $i < count($this->sections); $i++) {
+            if($this->canRead($this->sections[$i]) && $this->sections[$i]->isAdminSection() == $isAdmin) $return[] = $this->sections[$i];
+        }
+        return $return;
+    }
+
+    /**
+     *
+     * @param Section section
+     * @return AccessType
+     */
+    protected function getSectionAccess(Section $section)
+    {
+        return $this->type->getAccessToSection($section->id);
+    }
 }

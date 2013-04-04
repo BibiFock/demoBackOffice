@@ -9,12 +9,12 @@ $app->mount("/manage/rights/", new DemoBackOffice\Controller\ManageUserTypeContr
 $app->mount("/manage/users/", new DemoBackOffice\Controller\ManageUserController());
 
 //define 404
-$app->error(function (\Exception $e, $code) use ($app) { 
-	if($app['debug']) return;
-	if (404 == $code) { 
+$app->error(function (\Exception $e, $code) use ($app) {
+    if($app['debug']) return;
+    if (404 == $code) {
 
-		return $app['twig']->render('404.html.twig'); 
-		//return $app->redirect($app['url_generator']->generate('index.index'));
-	} 
-}); 
+        return $app['twig']->render('404.html.twig');
+        //return $app->redirect($app['url_generator']->generate('index.index'));
+    }
+});
 
